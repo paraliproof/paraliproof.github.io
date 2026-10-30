@@ -1,0 +1,148 @@
+/* ==========================================================================
+   ParaliProof design tokens · ui/css/tokens.css · v2.0 (27 Oct 2026)
+   Direction: docs/ux/DESIGN-DIRECTION.md ("restraint is the style"), after
+   the student's testmaxx system. Two tones + muted semantics. White ground,
+   hairlines, no card shadows, ONE accent (deep field green) on ≤10% of any
+   screen. One family: Plus Jakarta Sans (+ Noto Devanagari / Gurmukhi),
+   Geist Mono for ids and hashes.
+   Copied from ui/css/tokens.css (seva-frontend). THE file to edit to change the look. Contrast ratios noted as n:1.
+   ========================================================================== */
+
+/* Animatable numbers (progress ring, hold-to-stop fill) */
+@property --pp-p    { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --pp-hold { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+:root, [data-theme="light"] {
+  color-scheme: light;
+  /* surfaces */
+  --c-ground:    #FFFFFF;
+  --c-surface:   #FFFFFF;
+  --c-surface-2: #F5F6F4;   /* secondary surface, tracks */
+  --c-line:      #E4E7E2;   /* hairline */
+  --c-line-strong: #8E968F; /* input borders, 3.0:1 non-text */
+  /* ink */
+  --c-ink:       #101410;   /* 18.6:1 on white */
+  --c-ink-soft:  #535C55;   /*  6.9:1 */
+  --c-ink-faint: #8E968F;   /*  3.0:1: decoration + placeholders only, never body text */
+  /* the one accent: deep field green */
+  --c-accent:        #1E5B3A;  /* 8.0:1 on white; white on it 8.0:1 */
+  --c-accent-hover:  #174A2F;
+  --c-accent-press:  #123B25;
+  --c-accent-tint:   #E7F0EA;  /* selected / active surfaces */
+  --c-accent-soft:   #BFD6C7;  /* tracks, rules on tint */
+  --c-on-accent:     #FFFFFF;
+  /* semantics: muted, only on status, always with an icon and a word */
+  --c-success: #1D7A4D;  --c-success-tint: #E6F2EB;   /* 5.3:1 on white */
+  --c-warning: #B54708;  --c-warning-tint: #FBEFE6;   /* 5.4:1 on white */
+  --c-danger:  #B42318;  --c-danger-tint:  #FCEBE9;   /* 6.6:1 */
+  --c-idle:    #535C55;  --c-idle-tint:    #F0F1EF;
+  /* map */
+  --map-ground: #F5F6F4;
+  --map-plot:   #EDEFEA;
+  --map-plot-2: #E7EAE4;
+  --map-bund:   #FFFFFF;
+  --map-road:   #FFFFFF;
+  --map-road-edge: #D9DDD7;
+  --map-canal:  #D6E2E8;
+  --map-boundary: #101410;
+  --map-worked: #1E5B3A;
+  --map-transit: #8E968F;
+  --map-me: #101410;
+  /* floating things only (sheet, menu, dialog, toast) */
+  --shadow-float: 0 12px 32px -8px rgb(16 20 16 / .18), 0 2px 6px rgb(16 20 16 / .06);
+  --focus-ring: 0 0 0 2px var(--c-ground), 0 0 0 4px var(--c-accent);
+  color: var(--c-ink);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --c-ground: #0E1116; --c-surface: #151A21; --c-surface-2: #1C222B;
+  --c-line: #262D38; --c-line-strong: #6C746E;
+  --c-ink: #ECEDE8;       /* 16.1:1 on ground */
+  --c-ink-soft: #A6ADA8;  /*  7.6:1 on surface */
+  --c-ink-faint: #6C746E;
+  --c-accent: #5FB383; --c-accent-hover: #74C495; --c-accent-press: #4E9A6E;
+  --c-accent-tint: #16301F; --c-accent-soft: #24452F; --c-on-accent: #0E1116;  /* 7.4:1 */
+  --c-success: #5CC27A; --c-success-tint: #15291C;
+  --c-warning: #E6A23C; --c-warning-tint: #2E2312;
+  --c-danger:  #E16B64; --c-danger-tint:  #331A19;
+  --c-idle:    #A6ADA8; --c-idle-tint:    #1C222B;
+  --map-ground: #151A21; --map-plot: #1A2028; --map-plot-2: #1D242D; --map-bund: #0E1116;
+  --map-road: #262D38; --map-road-edge: #0E1116; --map-canal: #1B2B33;
+  --map-boundary: #ECEDE8; --map-worked: #5FB383; --map-transit: #6C746E; --map-me: #ECEDE8;
+  --shadow-float: 0 12px 32px -8px rgb(0 0 0 / .6), 0 2px 6px rgb(0 0 0 / .4);
+  --focus-ring: 0 0 0 2px var(--c-ground), 0 0 0 4px var(--c-accent);
+  color: var(--c-ink);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --c-ground: #0E1116; --c-surface: #151A21; --c-surface-2: #1C222B;
+    --c-line: #262D38; --c-line-strong: #6C746E;
+    --c-ink: #ECEDE8; --c-ink-soft: #A6ADA8; --c-ink-faint: #6C746E;
+    --c-accent: #5FB383; --c-accent-hover: #74C495; --c-accent-press: #4E9A6E;
+    --c-accent-tint: #16301F; --c-accent-soft: #24452F; --c-on-accent: #0E1116;
+    --c-success: #5CC27A; --c-success-tint: #15291C;
+    --c-warning: #E6A23C; --c-warning-tint: #2E2312;
+    --c-danger: #E16B64; --c-danger-tint: #331A19;
+    --c-idle: #A6ADA8; --c-idle-tint: #1C222B;
+    --map-ground: #151A21; --map-plot: #1A2028; --map-plot-2: #1D242D; --map-bund: #0E1116;
+    --map-road: #262D38; --map-road-edge: #0E1116; --map-canal: #1B2B33;
+    --map-boundary: #ECEDE8; --map-worked: #5FB383; --map-transit: #6C746E; --map-me: #ECEDE8;
+    --shadow-float: 0 12px 32px -8px rgb(0 0 0 / .6), 0 2px 6px rgb(0 0 0 / .4);
+    --focus-ring: 0 0 0 2px var(--c-ground), 0 0 0 4px var(--c-accent);
+  }
+}
+
+/* Sun mode ([data-contrast="sun"] on <html>): hairlines darken for glare. */
+[data-contrast="sun"] { --c-line: #9AA29B; --c-ink-soft: #3A423C; }
+
+:root {
+  /* ---------- Type ---------- */
+  --font-sans: "Plus Jakarta Sans", "Noto Sans Devanagari", "Noto Sans Gurmukhi", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --fw-body: 400; --fw-label: 500; --fw-head: 600; --fw-display: 700;
+  --track-display: -0.01em;
+
+  /* ---------- Space: 8 pt grid ---------- */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 40px; --sp-8: 48px; --sp-9: 64px;
+  --gutter: 16px;
+
+  /* ---------- Shape ---------- */
+  --r-card: 12px; --r-button: 10px; --r-input: 10px; --r-chip: 999px; --r-sheet: 16px;
+
+  /* ---------- Touch ---------- */
+  --tap: 56px;        /* operator screens */
+  --tap-dense: 44px;  /* officer desktop */
+  --tap-hold: 72px;   /* hold-to-stop */
+
+  /* ---------- Motion: state changes only, nothing loops ---------- */
+  --dur-fast: 120ms; --dur: 150ms; --dur-slow: 180ms;
+  --ease: cubic-bezier(.2, 0, 0, 1);
+  --dur-hold: 2000ms;  /* functional, not decorative */
+
+  /* ---------- Layers ---------- */
+  --z-sticky: 100; --z-tabbar: 200; --z-scrim: 390; --z-sheet: 400; --z-toast: 500;
+
+  /* ---------- Layout ---------- */
+  --topbar-h: 56px; --tabbar-h: 64px; --rail-w: 232px; --content-max: 1120px;
+  --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px); --safe-r: env(safe-area-inset-right, 0px);
+}
+
+/* Type scale: display 40/44, h1 28, h2 22, h3 18, body 16, small 13.
+   Re-declared on every [lang] element so Indic text gets +10% size and
+   taller lines (custom properties resolve where they are declared). */
+:root, [lang] {
+  --fs-display: calc(40px * var(--k, 1));  --lh-display: 1.1;
+  --fs-h1: calc(28px * var(--k, 1));       --lh-h1: 1.2;
+  --fs-h2: calc(22px * var(--k, 1));       --lh-h2: 1.3;
+  --fs-h3: calc(18px * var(--k, 1));       --lh-h3: 1.35;
+  --fs-body: calc(16px * var(--k, 1));     --lh-body: 1.5;
+  --fs-small: calc(13px * var(--k, 1));    --lh-small: 1.4;
+  --fs-num-xl: 56px;   /* the one key numeral: digits are Latin in every language */
+}
+:lang(en) { --k: 1; }
+:lang(hi), :lang(pa) { --k: 1.1; --lh-body: 1.65; --lh-h1: 1.35; --lh-h2: 1.4; --lh-display: 1.25; }
+
+@media (prefers-reduced-motion: reduce) { :root { --dur-fast: 0ms; --dur: 0ms; --dur-slow: 0ms; } }

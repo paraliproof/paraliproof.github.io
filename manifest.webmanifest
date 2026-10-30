@@ -1,0 +1,19 @@
+{
+  "name": "ParaliProof — Crop-Residue Work Verifier",
+  "short_name": "ParaliProof",
+  "description": "Verify crop-residue-management work with GPS + vibration and issue signed certificates. Offline-first.",
+  "id": "./",
+  "start_url": "./#job",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3F1EA",
+  "theme_color": "#0f3b2b",
+  "lang": "en",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

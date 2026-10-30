@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://tile.openstreetmap.org https://server.arcgisonline.com; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self'; object-src 'none'; base-uri 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ParaliProof — Crop-Residue Work Verifier</title>
+<meta name="description" content="Verify crop-residue-management work (Happy Seeder, Super Seeder, baler, mulcher) with GPS + vibration and issue signed, tamper-evident certificates. Works offline.">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ParaliProof">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Libraries: exact pinned versions + Subresource Integrity (the browser refuses a changed file) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/style.css">
+<script defer src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@turf/turf@7.2.0/turf.min.js" integrity="sha384-ll8qH0IE3im19Dtlr1jtv5fdy+gm+0bx8T4+OYxPeJpc6PO1XLNFnyvdzaKJ78bU" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js" integrity="sha384-8FWZA6BGMXhsfO+BLtrJK0We6gg5o1JyO8xQm6peWDEUs17ACA5ziE/NIAkl9z2k" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" integrity="sha384-b5Ya4Bq3qCyz39m2ISh+4DxjAIljdeFwK/BsXLuj9gugaNwAcj/ia15fxNZL9Nlx" crossorigin="anonymous"></script>
+<script type="module" src="js/app.js"></script>
+<script type="module" src="plugins/index.js"></script>
+</head>
+<body>
+<header class="pp-topbar no-print">
+  <a class="pp-wordmark" href="#job" aria-label="ParaliProof, record"><span class="pp-wordmark__glyph" aria-hidden="true"></span>ParaliProof</a>
+  <div class="pp-topbar__end">
+    <button id="demoBadge" class="topnote" hidden data-i18n="ui.demo"></button>
+    <button id="levelChip" class="level-chip" type="button" hidden aria-haspopup="dialog"></button>
+    <button id="langBtn" class="langbtn" aria-label="Language">EN</button>
+    <a href="#settings" class="pp-btn pp-btn--icon pp-btn--dense" aria-label="Settings"><svg class="pp-icon"><use href="#i-settings"/></svg></a>
+  </div>
+</header>
+
+<div id="banner" class="banner no-print" hidden></div>
+<p id="updateNote" class="update-note no-print" role="status" hidden data-i18n="sw.update"></p>
+<button type="button" id="offlineNote" class="offline-note no-print" hidden><svg class="pp-icon pp-icon--sm"><use href="#i-offline"/></svg><span data-i18n="off.note"></span></button>
+
+<main id="main">
+  <!-- RECORD -->
+  <section id="v-job" class="view" hidden data-view="job">
+    <div id="jobSetup">
+      <div class="pp-head">
+        <p class="pp-head__eyebrow" id="jobEyebrow" data-i18n="tabRecord"></p>
+        <h1 class="pp-head__title" data-i18n="ui.ready"></h1>
+        <p class="pp-head__context" id="jobFieldInfo"></p>
+      </div>
+      <div id="recoverBox"></div>
+      <div class="illus-slot illus-slot--empty" id="firstFieldIllus" hidden></div>
+      <div class="pp-notice first-field" id="firstField" hidden>
+        <svg class="pp-icon"><use href="#i-field"/></svg>
+        <span class="grow"><span class="pp-notice__title" data-i18n="ui.first_field_title"></span><span class="pp-notice__body" data-i18n="ui.first_field_body"></span>
+          <span class="first-field__actions"><a class="btn btn-primary btn-dense" href="#field" id="firstAddField" data-i18n="ui.add_field"></a><button class="btn btn-ghost btn-dense" id="firstDemoField" data-i18n="ui.use_demo_field"></button></span></span>
+      </div>
+      <section class="pp-section" id="twoScan">
+        <h2 class="pp-section__title" data-i18n="scan2.title"></h2>
+        <div class="pp-card pp-card--flush scan2">
+          <div class="scan2__row"><svg class="pp-icon" id="machineIcon"><use href="#i-tractor"/></svg><div class="scan2__main"><span class="pp-row__title" data-i18n="scan2.machine"></span><span class="pp-row__meta" id="machineInfo"></span>
+            <span class="scan2__actions"><button type="button" class="btn btn-ghost btn-dense" id="scanSticker" data-i18n="scan2.scan_sticker"></button></span></div></div>
+          <div class="scan2__row"><svg class="pp-icon" id="slipIcon"><use href="#i-list"/></svg><div class="scan2__main"><span class="pp-row__title" data-i18n="scan2.slip"></span><span class="pp-row__meta" id="slipInfo"></span>
+            <span class="scan2__actions"><button type="button" class="btn btn-ghost btn-dense" id="scanSlip" data-i18n="scan2.scan_slip"></button><button type="button" class="btn btn-tertiary btn-dense" id="clearSlip" hidden data-i18n="scan2.clear_slip"></button></span></div></div>
+        </div>
+      </section>
+      <div class="pp-field" id="jobFieldWrap"><label class="pp-label" for="jobField" data-i18n="field"></label><select id="jobField" class="inp"></select></div>
+      <div id="startWrap">
+        <button class="btn btn-primary btn-xxl" id="startBtn"><svg class="pp-icon"><use href="#i-play"/></svg><span data-i18n="startJob"></span></button>
+        <p class="hint center" style="margin-top:8px" data-i18n="phoneHint"></p>
+      </div>
+      <!-- UX-1: the job details fold into one row once they are set (machine · owner · phone place · vibration check) -->
+      <details class="job-details" id="jobDetails">
+        <summary><span class="job-details__head"><span class="job-details__title" data-i18n="rec.details"></span><span class="job-details__sum" id="jobDetailsSum"></span></span></summary>
+        <div class="job-details__body">
+          <div class="pp-field"><label class="pp-label" for="implSelect" data-i18n="implement"></label><select id="implSelect" class="inp"></select></div>
+          <div class="pp-field"><label class="pp-label" for="widthInp" data-i18n="workWidth"></label><div class="row width-row"><input id="widthInp" class="inp grow" type="number" min="0.5" max="12" step="0.1" inputmode="decimal"><span class="unit">m</span><span class="width-lock" id="widthLock" hidden><svg class="pp-icon pp-icon--sm"><use href="#i-lock"/></svg><span data-i18n="rec.width_locked"></span></span></div>
+            <p class="hint" id="widthHint" data-i18n="widthHint"></p></div>
+          <div class="pp-field"><label class="pp-label" for="ownerSel" data-i18n="own.title"></label><select id="ownerSel" class="inp"><option value="other" data-i18n="own.other"></option><option value="own" data-i18n="own.own"></option></select>
+            <p class="hint" id="ownerNote"></p></div>
+          <div class="pp-field"><label class="pp-label" for="placementSel" data-i18n="placement"></label><select id="placementSel" class="inp"></select></div>
+          <section class="pp-section">
+            <div class="row between"><h2 class="pp-section__title" data-i18n="calibration"></h2><span id="calibStatus" class="chip"></span></div>
+            <p class="hint" id="calibHint" data-i18n="calibHint"></p>
+            <p class="hint" id="calibHintMl" hidden data-i18n="calibHintMl"></p>
+            <button class="btn btn-ghost" id="calibBtn" data-i18n="calibrate"></button>
+          </section>
+          <div class="pp-field" id="demoCard" hidden>
+            <label class="pp-label" for="replaySpeed" data-i18n="replaySpeed"></label>
+            <select id="replaySpeed" class="inp">
+              <option value="10">10×</option><option value="30">30×</option><option value="60">60×</option><option value="120" selected>120×</option><option value="0" data-i18n="instant"></option>
+            </select>
+            <p class="hint" data-i18n="demoHint"></p>
+            <div class="pp-field" id="demoSrcWrap" hidden>
+              <label class="pp-label" for="demoSrc" data-i18n="demoSource"></label>
+              <select id="demoSrc" class="inp"></select>
+              <p class="hint" id="demoSrcLic"></p>
+            </div>
+          </div>
+        </div>
+      </details>
+      <button class="btn btn-tertiary" id="homeDemo" style="margin:0 auto;display:flex" data-i18n="runDemo"></button>
+      <a class="pp-card pp-card--flush tour-card no-print" id="tourCard" href="?tour=1#job">
+        <span class="pp-row"><svg class="pp-icon"><use href="#i-play"/></svg><span class="pp-row__main"><span class="pp-row__title" data-i18n="tour.card_title"></span><span class="pp-row__meta" data-i18n="tour.card_meta"></span></span><svg class="pp-icon"><use href="#i-chevron-right"/></svg></span>
+      </a>
+    </div>
+
+    <div id="jobLive" hidden>
+      <div class="pp-rec__top"><span class="pp-status"><span class="pp-dot" style="--s:var(--c-danger)"></span><span><span data-i18n="ui.recording"></span> · <span class="pp-num" id="lvTime">0:00</span></span></span><span class="pp-status"><svg class="pp-icon"><use href="#i-gps"/></svg><span>GPS ±<span id="lvAcc">–</span> m</span></span></div>
+      <div id="statusPill" class="status-pill status--idle" role="status" aria-live="polite">
+        <p class="status-word"><span class="status-icon" id="statusIcon"></span><b id="statusText"></b></p>
+        <span class="status-rule" aria-hidden="true"></span>
+        <small id="statusConf"></small>
+      </div>
+      <!-- UX-5 slot 3: a small picture that matches the status word (implement down / on the road / stopped) -->
+      <div class="rec-illus" id="recIllus" hidden aria-hidden="true"></div>
+      <div class="pp-stats">
+        <div class="pp-stat"><span class="pp-stat__value" id="lvAcres">0.00</span><span class="pp-stat__label" data-i18n="liveAcres"></span></div>
+        <div class="pp-stat"><span class="pp-stat__value" id="lvCov">0%</span><span class="pp-stat__label" data-i18n="ui.of_field"></span></div>
+        <div class="pp-stat"><span class="pp-stat__value" id="lvSpeed">–</span><span class="pp-stat__label">km/h</span></div>
+      </div>
+      <div class="map-wrap"><div id="jobMap" class="map map-tall"></div>
+        <div class="map-overlay legend"><span class="lg w"></span><span data-i18n="WORKING"></span><span class="lg t"></span><span data-i18n="TRANSIT"></span><span class="lg i"></span><span data-i18n="IDLE"></span></div>
+      </div>
+      <!-- UX-1: a calmer recording screen; the sensor read-outs and training labels sit behind one row -->
+      <details class="rec-sensors" id="recSensors">
+        <summary class="pp-section__title" data-i18n="rec.sensors"></summary>
+        <div class="vib"><span data-i18n="vibration"></span><svg id="lvSpark" class="spark" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true"></svg><span id="lvVibTxt" class="pp-num">–</span></div>
+        <div class="chips" id="lvSensors"></div>
+        <details class="card" id="trainBox">
+          <summary class="pp-section__title" data-i18n="trainLabels"></summary>
+          <p class="hint" data-i18n="trainHint"></p>
+          <div class="seg seg4" id="trainLabels">
+            <button data-label="" class="on" data-i18n="trainOff"></button>
+            <button data-label="WORKING" data-i18n="WORKING"></button>
+            <button data-label="TRANSIT" data-i18n="TRANSIT"></button>
+            <button data-label="IDLE" data-i18n="IDLE"></button>
+          </div>
+        </details>
+      </details>
+      <div class="rec-stopbar no-print">
+        <button class="btn btn-stop" id="stopBtn"><span class="stop-ring" aria-hidden="true"><svg viewBox="0 0 40 40"><circle class="stop-ring__track" cx="20" cy="20" r="17"/><circle class="stop-ring__bar" cx="20" cy="20" r="17" pathLength="100"/><rect class="stop-ring__sq" x="14.5" y="14.5" width="11" height="11" rx="2"/></svg></span><span class="stop-label" data-i18n="stopJob"></span></button>
+        <p class="hint center" data-i18n="holdToStop"></p>
+      </div>
+    </div>
+
+    <div id="jobResult" hidden>
+      <div class="pp-head">
+        <p class="pp-head__eyebrow" id="resEyebrow" data-i18n="results"></p>
+        <h1 class="pp-head__title" id="resTitle" data-i18n="ui.result_title"></h1>
+        <p class="pp-head__context" id="resContext"></p>
+      </div>
+      <div id="resKpis"></div>
+      <div class="map-wrap"><div id="resMap" class="map"></div></div>
+      <section class="pp-section"><h2 class="pp-section__title" data-i18n="checks"></h2><div id="resChecks"></div></section>
+      <div id="slotSatPics"></div>
+      <!-- UX-1/UX-2: everything an officer may need, folded into one row -->
+      <details class="card res-tech" id="resTech">
+        <summary class="pp-section__title" data-i18n="ui.officer_details"></summary>
+        <div id="slotSat"></div>
+        <div id="slotImpact"></div>
+        <section class="pp-section"><h2 class="pp-section__title" data-i18n="integrityFlags"></h2><div id="resFlags"></div></section>
+        <section class="pp-section" id="resMethod"></section>
+        <div class="row wrap">
+          <button class="btn btn-ghost btn-dense" id="exportJobBtn" data-i18n="exportJob"></button>
+          <button class="btn btn-ghost btn-dense" id="mlExportBtn" data-i18n="mlExport"></button>
+        </div>
+      </details>
+      <div class="pp-actionbar no-print"><button class="btn btn-primary btn-xxl" id="issueBtn" data-i18n="issueCert"></button>
+        <button class="btn btn-tertiary btn-dense res-cert-link" id="resCertLink" hidden data-i18n="viewCert"></button></div>
+    </div>
+  </section>
+
+  <!-- FIELDS -->
+  <section id="v-field" class="view" hidden data-view="field">
+    <div class="pp-head">
+      <p class="pp-head__eyebrow" data-i18n="ui.on_this_phone"></p>
+      <h1 class="pp-head__title" data-i18n="fieldSetup"></h1>
+      <p class="pp-head__context" id="drawHint"></p>
+    </div>
+    <div class="illus-slot illus-slot--empty" id="fieldIllus" hidden></div>
+    <div class="pp-field">
+      <label class="pp-label" for="fieldSelect" data-i18n="savedFields"></label>
+      <select id="fieldSelect" class="inp"></select>
+      <button class="btn btn-tertiary btn-dense btn-danger field-delete" id="fieldDelete" data-i18n="delete"></button>
+    </div>
+    <hr class="pp-rule">
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="newField"></h2>
+      <div class="seg" role="tablist" id="drawMode">
+        <button role="tab" data-mode="tap" class="on" data-i18n="modeTap"></button>
+        <button role="tab" data-mode="walk" data-i18n="modeWalk"></button>
+        <button role="tab" data-mode="corner" data-i18n="modeCorner"></button>
+      </div>
+      <div class="map-wrap"><div id="fieldMap" class="map map-tall"></div>
+        <div class="map-overlay area-pill" id="areaPill">0.00 ac · 0.00 ha</div>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-primary" id="walkBtn" hidden data-i18n="walkStart"></button>
+        <button class="btn btn-primary" id="cornerBtn" hidden data-i18n="addCorner"></button>
+        <button class="btn btn-ghost btn-dense" id="locateBtn" data-i18n="locateMe"></button>
+        <button class="btn btn-ghost btn-dense" id="undoBtn" data-i18n="undo"></button>
+        <button class="btn btn-ghost btn-dense" id="clearBtn" data-i18n="clear"></button>
+        <button class="btn btn-ghost btn-dense" id="layerBtn" data-i18n="satellite"></button>
+      </div>
+      <p class="warn" id="fieldWarn" hidden></p>
+      <div class="pp-field">
+        <label class="pp-label" for="fieldLabel" data-i18n="fieldLabel"></label>
+        <input id="fieldLabel" class="inp" maxlength="40" autocomplete="off" data-i18n-ph="fieldLabelPh">
+        <p class="hint" data-i18n="fieldLabelHint"></p>
+      </div>
+      <button class="btn btn-primary btn-xxl" id="saveField" data-i18n="saveField"></button>
+    </section>
+  </section>
+
+  <!-- CERTIFICATES (list) -->
+  <section id="v-certs" class="view" hidden data-view="certs">
+    <div class="pp-head">
+      <p class="pp-head__eyebrow" data-i18n="ui.on_this_phone"></p>
+      <h1 class="pp-head__title" data-i18n="certsTitle"></h1>
+      <p class="pp-head__context" id="certsCtx"></p>
+      <div class="pp-head__action"><a class="btn btn-tertiary btn-dense" href="#dash" data-i18n="ui.officer"></a></div>
+    </div>
+    <div id="certList" class="list"></div>
+  </section>
+
+  <!-- CERTIFICATE (document) -->
+  <section id="v-cert" class="view" hidden data-view="cert">
+    <div class="row between no-print"><a class="btn btn-tertiary btn-dense" href="#certs"><svg class="pp-icon"><use href="#i-arrow-left"/></svg><span data-i18n="certsTitle"></span></a><button class="btn btn-tertiary btn-dense" id="certVerifyBtn" data-i18n="verifyThis"></button></div>
+    <!-- UX-1: right after Issue, the operator's next two moves -->
+    <section class="cert-next no-print" id="certNext" hidden>
+      <div id="certNextIllus" class="illus-slot illus-slot--card" hidden></div>
+      <p class="cert-next__title" id="certNextTitle" data-i18n="next.ready"></p>
+      <p class="hint" id="certNextHint" data-i18n="next.ready_hint"></p>
+      <button type="button" class="btn btn-primary btn-xxl" id="certShowQr"><svg class="pp-icon"><use href="#i-qr"/></svg><span data-i18n="next.show_qr"></span></button>
+      <button type="button" class="btn btn-ghost btn-xxl" id="certNextField"><svg class="pp-icon"><use href="#i-field"/></svg><span data-i18n="next.next_field"></span></button>
+    </section>
+    <article id="certDoc" class="pp-doc" data-theme="light"></article>
+    <div class="cert-actions no-print">
+      <button class="btn btn-primary" id="shareBtn"><svg class="pp-icon"><use href="#i-share"/></svg><span data-i18n="share"></span></button>
+      <button class="btn btn-ghost" id="printBtn"><svg class="pp-icon"><use href="#i-download"/></svg><span data-i18n="print"></span></button>
+      <button class="btn btn-ghost" id="certJsonBtn" data-i18n="downloadJson"></button>
+    </div>
+  </section>
+
+  <!-- VERIFY -->
+  <section id="v-verify" class="view" hidden data-view="verify">
+    <div class="pp-head">
+      <p class="pp-head__eyebrow" data-i18n="tabVerify"></p>
+      <h1 class="pp-head__title" data-i18n="verifyTitle"></h1>
+      <p class="pp-head__context" data-i18n="ui.verify_ctx"></p>
+    </div>
+    <div class="stack-8">
+      <button class="btn btn-primary btn-xxl" id="scanBtn"><svg class="pp-icon"><use href="#i-scan"/></svg><span data-i18n="scanQr"></span></button>
+      <label class="btn btn-ghost file-btn"><svg class="pp-icon"><use href="#i-download"/></svg><span data-i18n="uploadQr"></span><input type="file" accept="image/*" id="qrFile" hidden></label>
+      <label class="btn btn-ghost file-btn"><svg class="pp-icon"><use href="#i-certificate"/></svg><span data-i18n="verify.file"></span><input type="file" accept="application/json,.json" id="certFile" hidden></label>
+      <p class="hint" data-i18n="verify.file_hint"></p>
+    </div>
+    <div id="scanBox" class="scan" hidden><video id="scanVideo" playsinline muted></video><div class="scan-frame"></div><button class="btn btn-ghost" id="scanStop" data-i18n="cancel"></button></div>
+    <details class="paste">
+      <summary class="pp-section__title" data-i18n="pasteCert"></summary>
+      <textarea id="certText" class="inp mono" rows="4" placeholder="PP1|{…}|…|…" aria-label="Certificate text"></textarea>
+      <div class="row wrap"><button class="btn btn-ghost btn-dense" id="verifyBtn" data-i18n="verify"></button><button class="btn btn-tertiary btn-dense" id="tamperBtn" data-i18n="tamperDemo"></button></div>
+    </details>
+    <div id="verifyResult"></div>
+  </section>
+
+  <!-- OFFICER DASHBOARD -->
+  <section id="v-dash" class="view" hidden data-view="dash">
+    <div class="pp-head">
+      <p class="pp-head__eyebrow" data-i18n="tabOfficer"></p>
+      <h1 class="pp-head__title" data-i18n="dashTitle"></h1>
+      <p class="pp-head__context" id="dashCtx"></p>
+      <div class="pp-head__action dash-actions">
+        <button class="btn btn-ghost btn-dense" id="csvBtn"><svg class="pp-icon"><use href="#i-download"/></svg><span data-i18n="exportCsv"></span></button>
+        <button class="btn btn-ghost btn-dense" id="hqBtn"><svg class="pp-icon"><use href="#i-download"/></svg><span data-i18n="hq.btn"></span></button>
+        <button class="btn btn-ghost btn-dense" id="matchSlipBtn" data-i18n="match.btn"></button>
+        <button class="btn btn-ghost btn-dense" id="demoFleetBtn" data-i18n="demoFleet"></button>
+      </div>
+    </div>
+    <div id="dashKpis" class="kpis kpis-4"></div>
+    <div class="dash-split">
+      <section class="pp-section"><h2 class="pp-section__title" data-i18n="ui.flagged_first"></h2><div class="table-wrap"><table class="tbl" id="dashTable"></table></div></section>
+      <section class="pp-section"><h2 class="pp-section__title" data-i18n="map"></h2><div id="dashMap" class="map map-tall"></div>
+        <div class="row"><label for="rateInp" class="lbl inline"><span data-i18n="rate"></span> <input id="rateInp" class="inp rate" type="number" min="0" step="50" inputmode="numeric"></label></div>
+        <p class="hint" data-i18n="rateHint"></p></section>
+    </div>
+  </section>
+
+  <!-- FIRST RUN: language, then role -->
+  <section id="v-welcome" class="view" hidden data-view="welcome">
+    <div class="illus-slot illus-slot--wide" id="welIllus" hidden></div>
+    <div class="pp-head">
+      <p class="pp-head__eyebrow">ParaliProof</p>
+      <h1 class="pp-head__title" id="welTitle"></h1>
+      <p class="pp-head__context" id="welCtx"></p>
+    </div>
+    <div id="welLang" class="wel-langs" role="group" aria-labelledby="welTitle">
+      <button type="button" class="wel-lang" data-lang="en" lang="en">English</button>
+      <button type="button" class="wel-lang" data-lang="hi" lang="hi">हिंदी</button>
+      <button type="button" class="wel-lang" data-lang="pa" lang="pa">ਪੰਜਾਬੀ</button>
+    </div>
+    <div id="welRole" class="pp-card pp-card--flush" role="group" aria-labelledby="welTitle" hidden>
+      <button type="button" class="pp-row wel-role" data-role="operator"><svg class="pp-icon"><use href="#i-tractor"/></svg><span class="pp-row__main"><span class="pp-row__title" data-i18n="role.operator"></span><span class="pp-row__meta" data-i18n="role.operator_sub"></span></span><svg class="pp-icon"><use href="#i-chevron-right"/></svg></button>
+      <button type="button" class="pp-row wel-role" data-role="officer"><svg class="pp-icon"><use href="#i-shield"/></svg><span class="pp-row__main"><span class="pp-row__title" data-i18n="role.officer"></span><span class="pp-row__meta" data-i18n="role.officer_sub"></span></span><svg class="pp-icon"><use href="#i-chevron-right"/></svg></button>
+      <button type="button" class="pp-row wel-role" data-role="farmer"><svg class="pp-icon"><use href="#i-user"/></svg><span class="pp-row__main"><span class="pp-row__title" data-i18n="role.farmer"></span><span class="pp-row__meta" data-i18n="role.farmer_sub"></span></span><svg class="pp-icon"><use href="#i-chevron-right"/></svg></button>
+    </div>
+    <div id="welLevel" class="pp-card pp-card--flush" role="group" aria-labelledby="welTitle" hidden></div>
+    <button type="button" class="btn btn-tertiary btn-dense wel-tour" id="welBackLang" hidden>Language · भाषा · ਭਾਸ਼ਾ</button>
+    <!-- UX-4 / J-1: a clear judge-mode card on the first screen (opens the guided tour) -->
+    <a class="pp-card pp-card--flush tour-card judge-card no-print" id="welTour" href="?tour=1#job">
+      <span class="pp-row"><svg class="pp-icon"><use href="#i-play"/></svg><span class="pp-row__main"><span class="pp-row__title" data-i18n="judge.card_title"></span><span class="pp-row__meta" data-i18n="judge.card_meta"></span></span><svg class="pp-icon"><use href="#i-chevron-right"/></svg></span>
+    </a>
+  </section>
+
+  <!-- OPERATOR SETUP (once) -->
+  <section id="v-opsetup" class="view" hidden data-view="opsetup">
+    <div class="illus-slot illus-slot--wide" id="opIllus" hidden></div>
+    <div class="pp-head">
+      <p class="pp-head__eyebrow" data-i18n="role.operator"></p>
+      <h1 class="pp-head__title" data-i18n="op.title"></h1>
+      <p class="pp-head__context" data-i18n="op.ctx"></p>
+    </div>
+    <div class="pp-field">
+      <label class="pp-label" for="chcName" data-i18n="op.chc"></label>
+      <input id="chcName" class="inp" maxlength="40" autocomplete="organization">
+      <p class="hint" data-i18n="op.chc_hint"></p>
+    </div>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="scan2.machine"></h2>
+      <p class="pp-row__meta" id="opMachine"></p>
+      <div class="row wrap"><button type="button" class="btn btn-primary" id="opScanSticker" data-i18n="scan2.scan_sticker"></button><button type="button" class="btn btn-ghost" id="opManual" data-i18n="op.manual"></button></div>
+      <div id="opManualBox" class="stack-8" hidden>
+        <div class="pp-field"><label class="pp-label" for="opImpl" data-i18n="implement"></label><select id="opImpl" class="inp"></select></div>
+        <div class="pp-field"><label class="pp-label" for="opWidth" data-i18n="workWidth"></label><div class="row width-row"><input id="opWidth" class="inp grow" type="number" min="0.5" max="12" step="0.1" inputmode="decimal"><span class="unit">m</span></div></div>
+        <p class="warn" data-i18n="op.manual_warn"></p>
+        <button type="button" class="btn btn-ghost btn-dense" id="opManualSave" data-i18n="op.manual_save"></button>
+      </div>
+    </section>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="reg.title"></h2>
+      <p class="hint" data-i18n="reg.hint"></p>
+      <button type="button" class="btn btn-ghost" id="opRegister" data-i18n="reg.show"></button>
+    </section>
+    <button type="button" class="btn btn-primary btn-xxl" id="opDone" data-i18n="op.done"></button>
+  </section>
+
+  <!-- OFFICER: REGISTERED PHONES -->
+  <section id="v-phones" class="view" hidden data-view="phones">
+    <div class="pp-head">
+      <p class="pp-head__eyebrow" data-i18n="role.officer"></p>
+      <h1 class="pp-head__title" data-i18n="phones.title"></h1>
+      <p class="pp-head__context" data-i18n="phones.ctx"></p>
+    </div>
+    <button type="button" class="btn btn-primary btn-xxl" id="phonesScan"><svg class="pp-icon"><use href="#i-scan"/></svg><span data-i18n="phones.scan"></span></button>
+    <div id="phonesList"></div>
+    <p class="hint" data-i18n="phones.fallback"></p>
+  </section>
+
+  <!-- FARMER: MY CERTIFICATE -->
+  <section id="v-farmer" class="view" hidden data-view="farmer">
+    <div class="illus-slot illus-slot--card" id="farmerIllus" hidden></div>
+    <div class="pp-head">
+      <p class="pp-head__eyebrow" data-i18n="role.farmer"></p>
+      <h1 class="pp-head__title" data-i18n="farmer.title"></h1>
+      <p class="pp-head__context" data-i18n="farmer.ctx"></p>
+    </div>
+    <button type="button" class="btn btn-primary btn-xxl" id="farmerOpen"><svg class="pp-icon"><use href="#i-scan"/></svg><span data-i18n="farmer.open"></span></button>
+    <div id="farmerView"></div>
+  </section>
+
+  <!-- FARMER: MY JOB SLIP -->
+  <section id="v-slip" class="view" hidden data-view="slip">
+    <div class="pp-head">
+      <p class="pp-head__eyebrow" data-i18n="role.farmer"></p>
+      <h1 class="pp-head__title" data-i18n="slip.title"></h1>
+      <p class="pp-head__context" data-i18n="slip.ctx"></p>
+    </div>
+    <p class="pp-notice slip-honesty"><svg class="pp-icon"><use href="#i-info"/></svg><span data-i18n="slip.honesty"></span></p>
+    <div id="slipForm" class="pp-section">
+      <div class="pp-field"><label class="pp-label" for="slipReg" data-i18n="slip.reg"></label><input id="slipReg" class="inp mono" maxlength="24" autocomplete="off" autocapitalize="characters" placeholder="PB-123456"></div>
+      <div class="pp-field"><label class="pp-label" for="slipKh" data-i18n="slip.kh"></label><input id="slipKh" class="inp" maxlength="20" autocomplete="off" placeholder="45/12"></div>
+      <div class="pp-field"><label class="pp-label" for="slipRa" data-i18n="slip.ra"></label><div class="row width-row"><input id="slipRa" class="inp grow" type="number" min="0.1" max="100" step="0.01" inputmode="decimal"><span class="unit">ac</span></div></div>
+      <div class="pp-field"><span class="pp-label" data-i18n="slip.where"></span><p class="pp-row__meta" id="slipWhere"></p>
+        <div class="row wrap"><button type="button" class="btn btn-ghost btn-dense" id="slipGps" data-i18n="slip.gps"></button><button type="button" class="btn btn-ghost btn-dense" id="slipDemo" data-i18n="slip.demo"></button></div></div>
+      <button type="button" class="btn btn-primary btn-xxl" id="slipMake" data-i18n="slip.make"></button>
+    </div>
+    <div id="slipOut"></div>
+  </section>
+
+  <!-- GOVERNMENT LEVELS (js/views/gov.js renders each header + body) -->
+  <section id="v-queue" class="view" hidden data-view="queue"><div id="queueBody" class="gov-view"></div></section>
+  <section id="v-case" class="view" hidden data-view="case"><div id="caseBody" class="gov-view"></div></section>
+  <section id="v-audit" class="view" hidden data-view="audit"><div id="auditBody" class="gov-view"></div></section>
+  <section id="v-visits" class="view" hidden data-view="visits"><div id="visitsBody" class="gov-view"></div></section>
+  <section id="v-visit" class="view" hidden data-view="visit"><div id="visitBody" class="gov-view"></div></section>
+  <section id="v-approvals" class="view" hidden data-view="approvals"><div id="approvalsBody" class="gov-view"></div></section>
+  <section id="v-log" class="view" hidden data-view="log"><div id="logBody" class="gov-view"></div></section>
+  <section id="v-district" class="view" hidden data-view="district"><div id="districtBody" class="gov-view"></div></section>
+  <section id="v-state" class="view" hidden data-view="state"><div id="stateBody" class="gov-view"></div></section>
+  <section id="v-batch" class="view" hidden data-view="batch"><div id="batchBody" class="gov-view"></div></section>
+  <section id="v-dlec" class="view" hidden data-view="dlec"><div id="dlecBody" class="gov-view"></div></section>
+
+  <!-- MORE / SETTINGS -->
+  <section id="v-settings" class="view" hidden data-view="settings">
+    <div class="pp-head">
+      <p class="pp-head__eyebrow">ParaliProof</p>
+      <h1 class="pp-head__title" data-i18n="nav.more"></h1>
+    </div>
+    <div class="pp-card pp-card--flush">
+      <a class="pp-row" href="#dash"><svg class="pp-icon"><use href="#i-grid"/></svg><span class="pp-row__main"><span class="pp-row__title" data-i18n="ui.officer"></span><span class="pp-row__meta" data-i18n="ui.officer_sub"></span></span><svg class="pp-icon"><use href="#i-chevron-right"/></svg></a>
+    </div>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="role.title"></h2>
+      <select id="roleSel" class="inp" aria-label="Role"><option value="operator" data-i18n="role.operator"></option><option value="officer" data-i18n="role.officer"></option><option value="farmer" data-i18n="role.farmer"></option></select>
+      <div id="levelWrap" class="pp-field" hidden><label class="pp-label" for="levelSel" data-i18n="lvl.title"></label><select id="levelSel" class="inp"></select>
+        <p class="hint" data-i18n="lvl.demo"></p><p class="hint" id="levelDuty"></p></div>
+      <div class="row wrap" id="roleOpLinks"><a class="btn btn-ghost btn-dense" href="#opsetup" data-i18n="op.title"></a><button type="button" class="btn btn-ghost btn-dense" id="setRegister" data-i18n="reg.show"></button></div>
+    </section>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="prof.title"></h2>
+      <select id="stateSel" class="inp" aria-label="State profile"></select>
+      <div id="stateInfo" class="hint"></div>
+    </section>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="language"></h2>
+      <select id="langSel" class="inp" aria-label="Language"><option value="en">English</option><option value="hi">हिंदी</option><option value="pa">ਪੰਜਾਬੀ</option></select>
+      <label class="pp-switch"><span data-i18n="demoMode"></span><input type="checkbox" id="demoToggle"><span class="pp-switch__track"></span></label>
+      <label class="pp-switch"><span data-i18n="nightTheme"></span><input type="checkbox" id="nightToggle"><span class="pp-switch__track"></span></label>
+      <label class="pp-switch"><span data-i18n="set.vibrate"></span><input type="checkbox" id="vibToggle"><span class="pp-switch__track"></span></label>
+    </section>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="implPresets"></h2>
+      <p class="hint" data-i18n="presetHint"></p>
+      <div id="presetList" class="preset-list"></div>
+      <h2 class="pp-section__title" data-i18n="speedLimits"></h2>
+      <div class="row wrap">
+        <label class="lbl inline"><span data-i18n="idleBelow"></span> <input id="idleKmh" class="inp small" type="number" step="0.1" min="0"> km/h</label>
+        <label class="lbl inline"><span data-i18n="transitAbove"></span> <input id="maxWorkKmh" class="inp small" type="number" step="0.5" min="1"> km/h</label>
+      </div>
+    </section>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="deviceKey"></h2>
+      <p class="mono" id="keyInfo"></p>
+      <textarea id="pubKeyTxt" class="inp mono" rows="3" readonly aria-label="Public key"></textarea>
+      <button class="btn btn-ghost btn-dense" id="copyPub" data-i18n="copy"></button>
+      <h2 class="pp-section__title" data-i18n="trustedKeys"></h2>
+      <p class="hint" data-i18n="trustedHint"></p>
+      <div id="trustedList"></div>
+      <div class="row"><input id="trustInp" class="inp grow mono" data-i18n-ph="pastePub" aria-label="Public key"><button class="btn btn-ghost" id="trustAdd" data-i18n="add"></button></div>
+    </section>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="classifier"></h2>
+      <label class="pp-label" for="clfSel" data-i18n="classifierChoice"></label>
+      <select id="clfSel" class="inp"><option value="ml" data-i18n="clfMl"></option><option value="threshold" data-i18n="clfThreshold"></option></select>
+      <p id="clfInfo" class="hint"></p>
+      <button class="btn btn-ghost btn-dense" id="resetCalib" data-i18n="resetCalib"></button>
+    </section>
+    <section class="pp-section">
+      <h2 class="pp-section__title" data-i18n="data"></h2>
+      <div class="row wrap">
+        <button class="btn btn-ghost btn-dense" id="exportAll" data-i18n="exportAll"></button>
+        <button class="btn btn-ghost btn-dense" id="mlExportAll" data-i18n="mlExport"></button>
+        <label class="btn btn-ghost btn-dense file-btn"><span data-i18n="importData"></span><input type="file" accept="application/json,.json" id="importFile" hidden></label>
+        <button class="btn btn-ghost btn-dense btn-danger" id="wipeAll" data-i18n="wipeAll"></button>
+      </div>
+      <p class="hint" id="storageInfo"></p>
+    </section>
+    <section class="pp-section about">
+      <h2 class="pp-section__title" data-i18n="about"></h2>
+      <p id="aboutTxt" class="hint"></p>
+    </section>
+  </section>
+</main>
+
+<nav class="pp-tabbar tabbar no-print" aria-label="Main" style="--tabs:3" id="tabbar"></nav>
+
+<div id="tourBar" class="tour-bar no-print" role="region" aria-label="Guided tour" hidden>
+  <div class="tour-bar__in">
+    <div class="tour-bar__msg" aria-live="polite" aria-atomic="true"><p class="tour-bar__count"><span class="pp-num" id="tourCount"></span><span class="tour-bar__role" id="tourRole"></span></p><p class="tour-bar__text" id="tourText"></p></div>
+    <div class="tour-bar__actions"><button type="button" class="btn btn-ghost btn-dense" id="tourExit"></button><button type="button" class="btn btn-primary" id="tourNext"></button></div>
+  </div>
+</div>
+<div id="modal" class="modal" hidden><div class="modal-card" role="dialog" aria-modal="true"><div id="modalBody"></div></div></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<p id="srStatus" class="pp-sr-only" role="status" aria-live="polite"></p>
+<noscript><p style="padding:20px">ParaliProof needs JavaScript.</p></noscript>
+</body>
+</html>
