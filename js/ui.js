@@ -54,7 +54,7 @@ export function placeToast({ vh, h, gap = 12, bars = [], buttons = [], topLimit 
   if (band.top > topLimit + gap && !buttons.some((r) => hits(band, r))) return { edge: 'bottom', px: bottomPx };
   return { edge: 'top', px: Math.round(topLimit + gap) };
 }
-const BOTTOM_BARS = '.pp-tabbar, .pp-actionbar, .rec-stopbar, #tourBar';
+const BOTTOM_BARS = '.pp-tabbar, .pp-actionbar, .rec-stopbar, #tourBar, #walkBar';
 const shown = (n) => { const r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0 && !n.closest('[hidden]') && getComputedStyle(n).display !== 'none' && getComputedStyle(n).visibility !== 'hidden'; };
 export function toast(msg, ms = 2800) {
   const el = $('#toast');

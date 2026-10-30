@@ -35,6 +35,7 @@
   <div class="pp-topbar__end">
     <button id="demoBadge" class="topnote" hidden data-i18n="ui.demo"></button>
     <button id="levelChip" class="level-chip" type="button" hidden aria-haspopup="dialog"></button>
+    <button id="acctBtn" class="acct-avatar" type="button" hidden aria-haspopup="dialog"></button>
     <button id="langBtn" class="langbtn" aria-label="Language">EN</button>
     <a href="#settings" class="pp-btn pp-btn--icon pp-btn--dense" aria-label="Settings"><svg class="pp-icon"><use href="#i-settings"/></svg></a>
   </div>
@@ -305,6 +306,9 @@
       <button type="button" class="wel-lang" data-lang="hi" lang="hi">हिंदी</button>
       <button type="button" class="wel-lang" data-lang="pa" lang="pa">ਪੰਜਾਬੀ</button>
     </div>
+    <!-- acc-1: the demo account picker (js/views/account.js renders it); the three roles below stay for a real phone -->
+    <div id="welAccounts" class="wel-accounts" hidden></div>
+    <h2 class="pp-section__title wel-group" id="welOwnTitle" data-i18n="acc.g_own" hidden></h2>
     <div id="welRole" class="pp-card pp-card--flush" role="group" aria-labelledby="welTitle" hidden>
       <button type="button" class="pp-row wel-role" data-role="operator"><svg class="pp-icon"><use href="#i-tractor"/></svg><span class="pp-row__main"><span class="pp-row__title" data-i18n="role.operator"></span><span class="pp-row__meta" data-i18n="role.operator_sub"></span></span><svg class="pp-icon"><use href="#i-chevron-right"/></svg></button>
       <button type="button" class="pp-row wel-role" data-role="officer"><svg class="pp-icon"><use href="#i-shield"/></svg><span class="pp-row__main"><span class="pp-row__title" data-i18n="role.officer"></span><span class="pp-row__meta" data-i18n="role.officer_sub"></span></span><svg class="pp-icon"><use href="#i-chevron-right"/></svg></button>
@@ -484,6 +488,13 @@
   <div class="tour-bar__in">
     <div class="tour-bar__msg" aria-live="polite" aria-atomic="true"><p class="tour-bar__count"><span class="pp-num" id="tourCount"></span><span class="tour-bar__role" id="tourRole"></span></p><p class="tour-bar__text" id="tourText"></p></div>
     <div class="tour-bar__actions"><button type="button" class="btn btn-ghost btn-dense" id="tourExit"></button><button type="button" class="btn btn-primary" id="tourNext"></button></div>
+  </div>
+</div>
+<!-- acc-1: walkthrough of the demo accounts (js/walkthrough.js); the judge tour's bar styling, its own element -->
+<div id="walkBar" class="tour-bar walk-bar no-print" role="region" aria-label="Walkthrough" hidden>
+  <div class="tour-bar__in">
+    <div class="tour-bar__msg" aria-live="polite" aria-atomic="true"><p class="tour-bar__count"><span class="pp-num" id="walkCount"></span><span class="tour-bar__role" id="walkRole"></span></p><p class="tour-bar__text" id="walkText"></p></div>
+    <div class="tour-bar__actions"><button type="button" class="btn btn-ghost btn-dense" id="walkExit"></button><span class="walk-bar__nav"><button type="button" class="btn btn-ghost btn-dense" id="walkBack"></button><button type="button" class="btn btn-primary" id="walkNext"></button></span></div>
   </div>
 </div>
 <div id="modal" class="modal" hidden><div class="modal-card" role="dialog" aria-modal="true"><div id="modalBody"></div></div></div>

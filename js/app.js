@@ -30,6 +30,10 @@ import * as distViews from './views/district.js';
 import { activate as activateProfile } from './profile.js';
 import { kv } from './store.js';
 import { cleanupStaleTour } from './tour-data.js';
+import * as account from './views/account.js';
+import * as walk from './walkthrough.js';
+import { accountOf, isOfficerAccount } from './accounts.js';
+import { useOfficerKey } from './gov.js';
 
 const app = {
   settings: null,
@@ -41,7 +45,15 @@ const app = {
     document.documentElement.dataset.theme = app.settings.night ? 'dark' : 'light';
     applyI18n();
     $('#langBtn').textContent = { en: 'EN', hi: 'हिं', pa: 'ਪੰ' }[app.settings.lang];
-    const chip = $('#levelChip'); chip.hidden = !showLevelChip(app.settings);
+    // acc-1: a chosen DEMO account shows its avatar in the level chip's slot (never in judge mode: accountOf → null),
+    // and an officer account signs the officer log with its own key (js/gov.js)
+    const acct = accountOf(app.settings);
+    useOfficerKey(isOfficerAccount(acct) ? acct.id : null);
+    if (app.settings.tour && walk.isWalking()) walk.exit();
+    const av = $('#acctBtn'); av.hidden = !acct;
+    if (acct) { av.innerHTML = account.avatar(acct); av.setAttribute('aria-label', t('acc.profile_of', { name: acct.name })); }
+    const badge = $('#demoBadge'); badge.dataset.i18n = acct ? 'ui.demo_short' : 'ui.demo'; badge.textContent = t(badge.dataset.i18n); // "Demo" fits beside the avatar at 360 px
+    const chip = $('#levelChip'); chip.hidden = !showLevelChip(app.settings) || !!acct;
     // with the level chip, "Demo data" moves into the chip ("Demo · Block"), so the top bar fits at 360 px
     $('#demoBadge').hidden = !app.settings.demo || !chip.hidden;
     if (!chip.hidden) { chip.textContent = t('ui.demo_short') + ' · ' + t('lvl.short.' + levelOf(app.settings)); chip.setAttribute('aria-label', t('lvl.switch') + ' (' + t('ui.demo') + '): ' + t('lvl.short.' + levelOf(app.settings))); }
@@ -58,7 +70,7 @@ const VIEWS = {
   verify: { el: 'v-verify', tab: 'verify', show: (_, p) => verify.show(p) },
   dash: { el: 'v-dash', tab: 'dash', show: () => dash.show() },
   settings: { el: 'v-settings', tab: null, show: () => settingsView.show() },
-  welcome: { el: 'v-welcome', tab: null, show: () => onboard.show() },
+  welcome: { el: 'v-welcome', tab: null, show: (_, p) => onboard.show(p) },
   opsetup: { el: 'v-opsetup', tab: null, show: () => opsetup.show() },
   phones: { el: 'v-phones', tab: 'phones', show: () => phones.show() },
   farmer: { el: 'v-farmer', tab: 'farmer', show: (_, p) => farmer.show(p) },
@@ -142,7 +154,7 @@ async function boot() {
   $('#levelChip').addEventListener('click', () => levelSheet(app.settings, app.settings.lang, async (lv) => {
     app.settings.govLevel = lv; await S.saveSettings(app.settings); app.refreshChrome(); app.go(app.home());
   }));
-  for (const m of [record, fields, certs, verify, dash, settingsView, tour, onboard, opsetup, phones, farmer, slip, govViews, distViews]) m.init(app);
+  for (const m of [record, fields, certs, verify, dash, settingsView, tour, onboard, opsetup, phones, farmer, slip, govViews, distViews, account, walk]) m.init(app);
   exposeGlobalApi({ app, services: S, version: S.APP_VERSION });
   window.addEventListener('hashchange', route_);
   if (tour.tourRequested()) await tour.start({ focus: false }); // judge mode: everything below then uses the tour database

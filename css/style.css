@@ -655,3 +655,52 @@ body.is-focus .offline-note { display: none; }
   .pp-tick *, .pp-verdict__line.is-tick-play > span { animation: none !important; }
   .pp-tick__ripple { display: none; }
 }
+
+/* ---------- acc-1 (30 Oct): demo accounts — picker, profile corner, walkthrough bar ---------- */
+/* the avatar: the role icon on the pale accent tint in a hairline circle (an illustration, not a face) */
+.acct-avatar { box-sizing: border-box; display: inline-flex; flex: none; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--c-line); border-radius: 50%; background: var(--c-accent-tint); color: var(--c-accent); }
+.acct-avatar .pp-icon, .wel-role .acct-avatar .pp-icon:first-child { width: 18px; height: 18px; color: var(--c-accent); }
+.acct-avatar--lg { width: 56px; height: 56px; }
+.acct-avatar--lg .pp-icon { width: 28px; height: 28px; }
+/* the top-bar button keeps a 44 px target around the 32 px circle */
+#acctBtn { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+#acctBtn[hidden] { display: none; }
+#acctBtn:hover .acct-avatar { border-color: var(--c-line-strong); }
+.acct-pill { flex: none; padding: 1px 8px; border: 1px solid var(--c-line); border-radius: var(--r-chip); color: var(--c-ink-soft); font: var(--fw-label) 13px/1.5 var(--font-sans); letter-spacing: .02em; }
+/* picker */
+.wel-accounts { display: flex; flex-direction: column; gap: var(--sp-2); }
+.wel-accounts[hidden] { display: none; }
+.wel-group { margin: var(--sp-3) 0 0; }
+.acct-row { min-height: 76px; }
+.acct-row[aria-current="true"] { background: var(--c-accent-tint); }
+.acct-row__place { color: var(--c-ink-soft); }
+.acct-walk .pp-icon:first-child { color: var(--c-accent); }
+#welIllus.is-compact img { max-height: 13dvh; }
+/* profile sheet */
+.acct-sheet { display: flex; flex-direction: column; gap: var(--sp-4); }
+.acct-sheet__head { display: flex; align-items: center; gap: var(--sp-4); }
+.acct-sheet__name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin: 0; font-size: var(--fs-h3); font-weight: var(--fw-head); }
+.acct-sheet__role { margin: 2px 0 0; color: var(--c-ink-soft); }
+.acct-sheet .pp-dl dd { text-align: right; }
+.pp-dl > div.acct-identity { flex-direction: column; align-items: stretch; gap: var(--sp-1); }
+.acct-identity dt { display: inline-flex; align-items: center; gap: 6px; }
+.acct-sheet .acct-identity dd { text-align: left; color: var(--c-ink-soft); }
+.acct-note { margin: calc(-1 * var(--sp-2)) 0 0; }
+.acct-demo-id { display: flex; gap: var(--sp-2); align-items: flex-start; margin: 0; }
+.acct-demo-id .pp-icon { flex: none; margin-top: 2px; }
+.acct-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.acct-actions .btn { flex: 1 1 auto; }
+.acct-actions--quiet { justify-content: space-between; gap: 0; margin: 0 calc(-1 * var(--sp-3)); }
+.acct-actions--quiet .btn { flex: 0 0 auto; }
+/* walkthrough: the judge tour's bar, its own element; the tabs hide while it runs (as in the tour) */
+.walk-bar__nav { display: flex; align-items: center; gap: var(--sp-2); }
+.walk-bar__nav .btn-primary { min-width: 112px; min-height: 48px; }
+.walk-bar .btn[aria-disabled="true"] { opacity: .55; cursor: progress; }
+body.is-walking { padding-bottom: calc(var(--walk-h, 150px) + var(--sp-3)); }
+body.is-walking .pp-tabbar, body.is-walking #tourCard { display: none; }
+body.is-walking .pp-actionbar { bottom: var(--walk-h, 150px); }
+body.is-walking .toast { bottom: calc(var(--walk-h, 150px) + var(--sp-3)); }
+@media (min-width: 1000px) {
+  body.is-walking { padding-left: 0; }
+  body.is-walking .pp-topbar { margin-left: 0; }
+}

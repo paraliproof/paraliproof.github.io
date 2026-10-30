@@ -15,6 +15,7 @@ import { downloadText, readFileText, unb64u, fmtDate } from '../util.js';
 import { showRegistration } from './opsetup.js';
 import { roleOf } from '../roles.js';
 import { roleTable, levelOf, levelInfo } from '../govroles.js';
+import { matchAccount } from '../accounts.js'; // acc-1: a role / level change keeps the demo account in step (or clears it)
 import { getLang } from '../ui.js';
 import { activate, activeProfile, shippedProfiles } from '../profile.js';
 import { kv } from '../store.js';
@@ -26,14 +27,14 @@ export function init(a) {
   // UX-4 (re-render bug, UX review 15a): apply the change to the chrome and the language FIRST, then save.
   // Saving awaits IndexedDB; a screen opened during that wait used to render in the old language under a new header.
   const save = async () => { app.refreshChrome(); await S.saveSettings(app.settings); };
-  $('#roleSel').addEventListener('change', async () => { app.settings.role = $('#roleSel').value; await save(); show(); });
+  $('#roleSel').addEventListener('change', async () => { app.settings.role = $('#roleSel').value; app.settings.account = matchAccount(app.settings); await save(); show(); });
   $('#setRegister').addEventListener('click', () => showRegistration(app));
   $('#stateSel').addEventListener('change', async () => {
     try { await activate(app.settings, $('#stateSel').value || null, { kv, switched: true }); await save(); toast(t('prof.switched', { n: activeProfile() ? (activeProfile().name[getLang()] || activeProfile().name.en) : t('prof.none') })); }
     catch (e) { toast(e.message, 6000); app.settings.stateProfile = null; await activate(app.settings, null); await save(); }
     show();
   });
-  $('#levelSel').addEventListener('change', async () => { app.settings.govLevel = $('#levelSel').value || null; await save(); show(); });
+  $('#levelSel').addEventListener('change', async () => { app.settings.govLevel = $('#levelSel').value || null; app.settings.account = matchAccount(app.settings); await save(); show(); });
   $('#langSel').addEventListener('change', async () => { app.settings.lang = $('#langSel').value; await save(); show(); });
   $('#clfSel').addEventListener('change', async () => { app.settings.classifier = $('#clfSel').value; await save(); show(); });
   $('#mlExportAll').addEventListener('click', async () => downloadText(`paraliproof-recordings-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(await S.mlExport(app.settings))));

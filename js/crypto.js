@@ -28,9 +28,11 @@ export async function keyId(pubRaw) {
 /**
  * Load the device key from storage, or create one.
  * @param {{get:(k:string)=>Promise<any>, set:(k:string,v:any)=>Promise<void>}} kv
+ * @param {string} name  storage key: 'deviceKey' (this phone), or 'officerKey:<account>' for a DEMO officer
+ *                       account's own signing key (js/gov.js) — also generated HERE, on this phone.
  */
-export async function getDeviceKey(kv) {
-  let rec = await kv.get('deviceKey');
+export async function getDeviceKey(kv, name = 'deviceKey') {
+  let rec = await kv.get(name);
   if (rec) {
     if (rec.jwk) { // fallback format (see below)
       const privateKey = await crypto.subtle.importKey('jwk', rec.jwk, ALG, false, ['sign']);
@@ -42,7 +44,7 @@ export async function getDeviceKey(kv) {
   const pubRaw = new Uint8Array(await crypto.subtle.exportKey('raw', pair.publicKey));
   rec = { privateKey: pair.privateKey, pub: b64u(pubRaw), kid: await keyId(pubRaw), createdAt: Date.now() };
   try {
-    await kv.set('deviceKey', rec); // IndexedDB can store a CryptoKey object directly
+    await kv.set(name, rec); // IndexedDB can store a CryptoKey object directly
   } catch {
     // Some older browsers cannot store CryptoKey objects. Fall back to an
     // extractable key saved as JWK (weaker: the app could read it).
@@ -50,7 +52,7 @@ export async function getDeviceKey(kv) {
     const raw2 = new Uint8Array(await crypto.subtle.exportKey('raw', p2.publicKey));
     const jwk = await crypto.subtle.exportKey('jwk', p2.privateKey);
     rec = { jwk, pub: b64u(raw2), kid: await keyId(raw2), createdAt: Date.now(), weak: true };
-    await kv.set('deviceKey', rec);
+    await kv.set(name, rec);
     rec = { ...rec, privateKey: p2.privateKey };
   }
   return rec;

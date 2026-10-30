@@ -34,6 +34,28 @@ const cleanNote = (s, n = 280) => String(s ?? '').replace(/[<>`\u0000-\u0008\u00
 const LOG_KEY = 'govlog', SEED_KEY = 'auditSeed';
 const MAX_LOG = 5000;
 
+// ---------------- who signs: this phone's key, or a DEMO officer account's own key ----------------
+// Without an account (older installs, Settings → Officer level, judge mode) every entry is signed by the
+// phone's device key, as before. A DEMO officer account (js/accounts.js) signs with its OWN key, generated
+// on this phone the first time it signs (kv 'officerKey:<account id>'; non-extractable like the device key).
+// So on the one-phone demo the ADO and the SDAO really are two different keys, and the two-person
+// enrolment check below is a real check. At pilot each officer signs on their own phone after the
+// department's own login.
+let signerName = null;
+/** Sign later log entries as this DEMO officer account (null = this phone's device key). app.js sets it. */
+export function useOfficerKey(accountId) {
+  signerName = typeof accountId === 'string' && /^[a-z]{3,12}$/.test(accountId) ? 'officerKey:' + accountId : null;
+}
+export const officerKeyName = () => signerName;
+/** The key the next log entry will be signed with. */
+export const signerKey = () => getDeviceKey(kv, signerName || 'deviceKey');
+/** Run fn while signing as `accountId` (demo seeding: the ADO enrols, the DDA builds the batch), then restore. */
+export async function withOfficerKey(accountId, fn) {
+  const before = signerName;
+  useOfficerKey(accountId);
+  try { return await fn(); } finally { signerName = before; }
+}
+
 // ---------------- the signed, append-only log ----------------
 let queue = Promise.resolve();
 export async function readLog() { return (await kv.get(LOG_KEY)) || []; }
@@ -43,7 +65,7 @@ const entryHash = async (entry, sig) => sha256b64u(canonical(entry) + '|' + sig)
 export function appendLog(type, level, body) {
   const run = async () => {
     if (!LEVEL_IDS.includes(level)) throw new Error('Choose your officer level in Settings first.');
-    const key = await getDeviceKey(kv);
+    const key = await signerKey();
     const log = await readLog();
     if (log.length >= MAX_LOG) throw new Error('Log is full on this phone (export it first).');
     const last = log.at(-1);
@@ -114,15 +136,25 @@ export async function enrolPhone(level, settings, reg, saveSettings) {
   const chc = String(reg.chc).replace(/[<>|"'`&]/g, ' ').slice(0, 40);
   const rec = await appendLog('enrol', level, { kid: reg.kid, pub: reg.pub, chc });
   settings.trustedKeys = [...(settings.trustedKeys || []).filter((k) => k.pub !== reg.pub),
-    { kid: reg.kid, pub: reg.pub, chc, addedAt: Date.now(), via: 'registration', status: 'pending', enrolledBy: rec.h }];
+    { kid: reg.kid, pub: reg.pub, chc, addedAt: Date.now(), via: 'registration', status: 'pending', enrolledBy: rec.h, enrolKid: rec.kid }];
   await saveSettings(settings);
   return settings.trustedKeys.at(-1);
 }
-/** SDAO: countersign a pending enrolment → "active" (now trusted for payment). */
+export const SECOND_OFFICER = 'A second officer must countersign: this key made the enrolment.';
+/** SDAO: countersign a pending enrolment → "active" (now trusted for payment). Refused when the signing key
+ *  is the key that made the enrolment (two-person rule: one officer can never activate a phone alone). */
 export async function countersignPhone(level, settings, pub, saveSettings) {
   need(level, 'countersign');
   const k = (settings.trustedKeys || []).find((x) => x.pub === pub);
   if (!k || k.status !== 'pending') throw new Error('This phone is not waiting for a countersignature.');
+  // which key made the enrolment: kept on the entry, and re-read from the signed log (the log wins)
+  let enrolKid = k.enrolKid || null;
+  if (k.enrolledBy) {
+    const e = (await readLog()).find((x) => x.h === k.enrolledBy && x.type === 'enrol');
+    if (!e) throw new Error('The enrolment is not in the signed log on this phone.');
+    enrolKid = e.kid;
+  }
+  if (enrolKid && enrolKid === (await signerKey()).kid) throw new Error(SECOND_OFFICER);
   const rec = await appendLog('countersign', level, { kid: k.kid, pub: k.pub, enrol: k.enrolledBy || null });
   k.status = 'active'; k.countersignedBy = rec.h; k.activeAt = Date.now();
   await saveSettings(settings);

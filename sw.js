@@ -14,7 +14,7 @@
 //     font stylesheet and files never reached the cache and an offline reload fell back to system fonts.
 //   • Map tiles — network-first, cached as you view them (max ~600 tiles) so a
 //     field you looked at once still shows offline.
-const VERSION = 'pp-v1.9.1-ux6';
+const VERSION = 'pp-v1.10.0-acc1';
 const SHELL = `shell-${VERSION}`, LIBS = 'libs-v1', TILES = 'tiles-v1';
 // Real Sentinel-2 tiles for the result screen (tools/make_sat_thumbs.py; tests/sat-tour.test.mjs checks this list).
 const SAT_TILE_FILES = [
@@ -66,6 +66,7 @@ const SHELL_FILES = [
   './js/crosscheck.js', './js/strings-gov.js', './js/gov.js', './js/govroles.js', './js/views/gov.js', './js/views/district.js', './demo/demo-district.json', './js/profile.js', './js/stateroots.js', './profiles/state-profiles.js', './demo/state-slips.js',
   './js/illus.js', './img/illus/manifest.js',
   './js/views/onboard.js', './js/views/opsetup.js', './js/views/phones.js', './js/views/farmer.js', './js/views/slip.js', './demo/index.js', './demo/demo-fleet.json', './demo/real-track-cau-tractor.json',
+  './js/accounts.js', './js/demoseed.js', './js/strings-acc.js', './js/views/account.js', './js/walkthrough.js',
   ...SAT_TILE_FILES, ...ILLUS_FILES,
 ];
 // Must equal the stylesheet href in index.html (tests/ux.test.mjs checks it).

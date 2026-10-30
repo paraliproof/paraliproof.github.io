@@ -7,6 +7,7 @@
 // Keep status words (WORKING / TRANSIT / IDLE, VALID / TAMPERED) short.
 
 import { GOV_STRINGS } from './strings-gov.js';
+import { ACC_STRINGS } from './strings-acc.js';
 
 export const STRINGS = {
   _langs: ['en', 'hi', 'pa'],
@@ -663,3 +664,4 @@ export const STRINGS = {
   'dlec.done_body': { en: '{ap} approved, {rt} returned. The minutes are signed; the money can move now.', hi: '{ap} स्वीकृत, {rt} लौटाए। कार्यवृत्त हस्ताक्षरित; अब भुगतान आगे बढ़ सकता है।', pa: '{ap} ਮਨਜ਼ੂਰ, {rt} ਵਾਪਸ। ਕਾਰਵਾਈ ਉੱਤੇ ਦਸਤਖ਼ਤ ਹੋਏ; ਹੁਣ ਭੁਗਤਾਨ ਅੱਗੇ ਵਧ ਸਕਦਾ ਹੈ।' },
 };
 Object.assign(STRINGS, GOV_STRINGS); // government build strings (js/strings-gov.js)
+Object.assign(STRINGS, ACC_STRINGS); // demo accounts, profile corner, walkthrough (js/strings-acc.js)

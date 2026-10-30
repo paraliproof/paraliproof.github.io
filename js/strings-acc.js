@@ -1,0 +1,65 @@
+// strings-acc.js — UI text for the DEMO accounts (30 Oct, acc-1): the account picker, the profile corner and
+// the walkthrough. Merged into STRINGS by strings.js. English is the source text.
+// hi and pa are FIRST DRAFTS by the software team — NEEDS A NATIVE-SPEAKER CHECK before any field use.
+// tests/ux.test.mjs fails if a key loses its pa text or a {placeholder} differs between languages.
+
+export const ACC_STRINGS = {
+  // ---- the account picker (#welcome, second step) ----
+  'acc.title': { en: 'Choose a demo account', hi: 'डेमो खाता चुनें', pa: 'ਡੈਮੋ ਖਾਤਾ ਚੁਣੋ' },
+  'acc.ctx': { en: "Demo accounts. No password in the prototype; real sign-in uses the state's own login at pilot.", hi: 'डेमो खाते। प्रोटोटाइप में कोई पासवर्ड नहीं; पायलट में असली साइन-इन राज्य के अपने लॉगिन से होगा।', pa: 'ਡੈਮੋ ਖਾਤੇ। ਪ੍ਰੋਟੋਟਾਈਪ ਵਿੱਚ ਕੋਈ ਪਾਸਵਰਡ ਨਹੀਂ; ਪਾਇਲਟ ਵਿੱਚ ਅਸਲੀ ਸਾਈਨ-ਇਨ ਰਾਜ ਦੇ ਆਪਣੇ ਲੌਗਇਨ ਨਾਲ ਹੋਵੇਗਾ।' },
+  'acc.g_field': { en: 'In the field', hi: 'खेत में', pa: 'ਖੇਤ ਵਿੱਚ' },
+  'acc.g_gov': { en: 'Government', hi: 'सरकार', pa: 'ਸਰਕਾਰ' },
+  'acc.g_own': { en: 'Your own phone, no sample data', hi: 'अपना फ़ोन, बिना नमूना डेटा', pa: 'ਆਪਣਾ ਫ਼ੋਨ, ਬਿਨਾਂ ਨਮੂਨਾ ਡਾਟਾ' },
+  'acc.r_farmer': { en: 'Farmer', hi: 'किसान', pa: 'ਕਿਸਾਨ' },
+  'acc.r_operator': { en: 'Tractor operator', hi: 'ट्रैक्टर ऑपरेटर', pa: 'ਟਰੈਕਟਰ ਆਪਰੇਟਰ' },
+  'acc.r_chc': { en: 'CHC owner', hi: 'CHC मालिक', pa: 'CHC ਮਾਲਕ' },
+  'acc.demo': { en: 'DEMO', hi: 'डेमो', pa: 'ਡੈਮੋ' },
+  'acc.all_blocks': { en: 'all blocks', hi: 'सभी ब्लॉक', pa: 'ਸਾਰੇ ਬਲਾਕ' },
+  'acc.walk': { en: 'Walkthrough', hi: 'पूरा भ्रमण', pa: 'ਪੂਰੀ ਸੈਰ' },
+  'acc.walk_sub': { en: 'All 9 accounts in order, one screen each, with sample data', hi: 'सभी 9 खाते क्रम से, हर एक की एक स्क्रीन, नमूना डेटा सहित', pa: 'ਸਾਰੇ 9 ਖਾਤੇ ਕ੍ਰਮ ਨਾਲ, ਹਰ ਇੱਕ ਦੀ ਇੱਕ ਸਕਰੀਨ, ਨਮੂਨਾ ਡਾਟਾ ਸਮੇਤ' },
+  'acc.loading': { en: 'Loading sample data', hi: 'नमूना डेटा लोड हो रहा है', pa: 'ਨਮੂਨਾ ਡਾਟਾ ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ' },
+  'acc.loading_hint': { en: 'Demo district (39 sample claims, 4 villages), demo fleet and one finished, signed demo job. All marked DEMO. Only the first time.', hi: 'डेमो ज़िला (39 नमूना दावे, 4 गाँव), डेमो बेड़ा और एक पूरा, हस्ताक्षरित डेमो काम। सब पर डेमो लिखा है। सिर्फ़ पहली बार।', pa: 'ਡੈਮੋ ਜ਼ਿਲ੍ਹਾ (39 ਨਮੂਨਾ ਦਾਅਵੇ, 4 ਪਿੰਡ), ਡੈਮੋ ਬੇੜਾ ਅਤੇ ਇੱਕ ਪੂਰਾ, ਦਸਤਖ਼ਤੀ ਡੈਮੋ ਕੰਮ। ਸਭ ਉੱਤੇ ਡੈਮੋ ਲਿਖਿਆ ਹੈ। ਸਿਰਫ਼ ਪਹਿਲੀ ਵਾਰ।' },
+  'acc.step': { en: 'Step {i} of {n}', hi: 'चरण {i} / {n}', pa: 'ਪੜਾਅ {i} / {n}' },
+
+  // ---- the profile corner (avatar + sheet) ----
+  'acc.profile': { en: 'Profile', hi: 'प्रोफ़ाइल', pa: 'ਪ੍ਰੋਫਾਈਲ' },
+  'acc.profile_of': { en: 'Profile: {name}', hi: 'प्रोफ़ाइल: {name}', pa: 'ਪ੍ਰੋਫਾਈਲ: {name}' },
+  'acc.district': { en: 'District', hi: 'ज़िला', pa: 'ਜ਼ਿਲ੍ਹਾ' },
+  'acc.block': { en: 'Block / village', hi: 'ब्लॉक / गाँव', pa: 'ਬਲਾਕ / ਪਿੰਡ' },
+  'acc.language': { en: 'Language', hi: 'भाषा', pa: 'ਭਾਸ਼ਾ' },
+  'acc.chc': { en: 'CHC', hi: 'CHC', pa: 'CHC' },
+  'acc.phone': { en: 'This phone', hi: 'यह फ़ोन', pa: 'ਇਹ ਫ਼ੋਨ' },
+  'acc.st_none': { en: 'Not registered', hi: 'पंजीकृत नहीं', pa: 'ਰਜਿਸਟਰ ਨਹੀਂ' },
+  'acc.st_pending': { en: 'Pending: ADO signed', hi: 'लंबित: ADO ने हस्ताक्षर किए', pa: 'ਬਾਕੀ: ADO ਨੇ ਦਸਤਖ਼ਤ ਕੀਤੇ' },
+  'acc.st_active': { en: 'Active: SDAO countersigned', hi: 'सक्रिय: SDAO ने दूसरा हस्ताक्षर किया', pa: 'ਚਾਲੂ: SDAO ਨੇ ਦੂਜਾ ਦਸਤਖ਼ਤ ਕੀਤਾ' },
+  'acc.key': { en: 'Key id', hi: 'कुंजी id', pa: 'ਕੁੰਜੀ id' },
+  'acc.duty': { en: 'Duty', hi: 'काम', pa: 'ਕੰਮ' },
+  'acc.sign_key': { en: 'Signing key', hi: 'हस्ताक्षर कुंजी', pa: 'ਦਸਤਖ਼ਤ ਕੁੰਜੀ' },
+  'acc.farmer_id': { en: 'Farmer ID / MFMB ref.', hi: 'किसान ID / MFMB संदर्भ', pa: 'ਕਿਸਾਨ ID / MFMB ਹਵਾਲਾ' },
+  'acc.khasra': { en: 'Khasra', hi: 'खसरा', pa: 'ਖਸਰਾ' },
+  'acc.no_slip': { en: 'No slip on this phone yet', hi: 'इस फ़ोन पर अभी कोई स्लिप नहीं', pa: 'ਇਸ ਫ਼ੋਨ ਉੱਤੇ ਹਾਲੇ ਕੋਈ ਸਲਿੱਪ ਨਹੀਂ' },
+  'acc.identity': { en: 'Identity', hi: 'पहचान', pa: 'ਪਛਾਣ' },
+  'acc.id_field': { en: 'Checked by the state at MFMB / Farmer ID registration (Aadhaar-seeded). ParaliProof never sees your Aadhaar.', hi: 'राज्य MFMB / किसान ID पंजीकरण पर जाँचता है (आधार से जुड़ा)। ParaliProof आपका आधार कभी नहीं देखता।', pa: 'ਰਾਜ MFMB / ਕਿਸਾਨ ID ਰਜਿਸਟ੍ਰੇਸ਼ਨ ਵੇਲੇ ਜਾਂਚਦਾ ਹੈ (ਆਧਾਰ ਨਾਲ ਜੁੜਿਆ)। ParaliProof ਤੁਹਾਡਾ ਆਧਾਰ ਕਦੇ ਨਹੀਂ ਦੇਖਦਾ।' },
+  'acc.id_officer': { en: "The department's own officer login (at pilot). This demo has no password.", hi: 'विभाग का अपना अधिकारी लॉगिन (पायलट में)। इस डेमो में कोई पासवर्ड नहीं।', pa: 'ਵਿਭਾਗ ਦਾ ਆਪਣਾ ਅਧਿਕਾਰੀ ਲੌਗਇਨ (ਪਾਇਲਟ ਵਿੱਚ)। ਇਸ ਡੈਮੋ ਵਿੱਚ ਕੋਈ ਪਾਸਵਰਡ ਨਹੀਂ।' },
+  'acc.demo_identity': { en: 'DEMO identity: this signing key was made on this phone for the demo, so the ADO and the SDAO sign with different keys.', hi: 'डेमो पहचान: यह हस्ताक्षर कुंजी डेमो के लिए इसी फ़ोन पर बनी, ताकि ADO और SDAO अलग कुंजियों से हस्ताक्षर करें।', pa: 'ਡੈਮੋ ਪਛਾਣ: ਇਹ ਦਸਤਖ਼ਤ ਕੁੰਜੀ ਡੈਮੋ ਲਈ ਇਸੇ ਫ਼ੋਨ ਉੱਤੇ ਬਣੀ, ਤਾਂ ਜੋ ADO ਅਤੇ SDAO ਵੱਖ ਕੁੰਜੀਆਂ ਨਾਲ ਦਸਤਖ਼ਤ ਕਰਨ।' },
+  'acc.switch': { en: 'Switch account', hi: 'खाता बदलें', pa: 'ਖਾਤਾ ਬਦਲੋ' },
+  'acc.signout': { en: 'Sign out', hi: 'साइन आउट', pa: 'ਸਾਈਨ ਆਊਟ' },
+  'acc.settings': { en: 'Settings', hi: 'सेटिंग', pa: 'ਸੈਟਿੰਗ' },
+  'acc.close': { en: 'Close', hi: 'बंद करें', pa: 'ਬੰਦ ਕਰੋ' },
+  'acc.signout_note': { en: 'Signing out keeps all data on this phone.', hi: 'साइन आउट करने पर इस फ़ोन का सारा डेटा बना रहता है।', pa: 'ਸਾਈਨ ਆਊਟ ਕਰਨ ਨਾਲ ਇਸ ਫ਼ੋਨ ਦਾ ਸਾਰਾ ਡਾਟਾ ਰਹਿੰਦਾ ਹੈ।' },
+
+  // ---- the walkthrough (one plain sentence per account) ----
+  'walk.label': { en: 'Walkthrough of the demo accounts', hi: 'डेमो खातों का भ्रमण', pa: 'ਡੈਮੋ ਖਾਤਿਆਂ ਦੀ ਸੈਰ' },
+  'walk.back': { en: 'Back', hi: 'पीछे', pa: 'ਪਿੱਛੇ' },
+  'walk.exit': { en: 'Exit', hi: 'बाहर', pa: 'ਬਾਹਰ' },
+  'walk.exit_label': { en: 'Exit the walkthrough (the data stays)', hi: 'भ्रमण से बाहर (डेटा बना रहता है)', pa: 'ਸੈਰ ਤੋਂ ਬਾਹਰ (ਡਾਟਾ ਰਹਿੰਦਾ ਹੈ)' },
+  'walk.farmer': { en: "Tap the certificate: the farmer sees the acres, the date and the satellite check in plain words, and can share it.", hi: 'प्रमाणपत्र पर टैप करें: किसान एकड़, तारीख़ और सैटेलाइट जाँच सरल शब्दों में देखता है और इसे भेज सकता है।', pa: 'ਸਰਟੀਫਿਕੇਟ ਉੱਤੇ ਟੈਪ ਕਰੋ: ਕਿਸਾਨ ਏਕੜ, ਤਾਰੀਖ਼ ਅਤੇ ਸੈਟੇਲਾਈਟ ਜਾਂਚ ਸੌਖੇ ਸ਼ਬਦਾਂ ਵਿੱਚ ਦੇਖਦਾ ਹੈ ਅਤੇ ਇਸ ਨੂੰ ਭੇਜ ਸਕਦਾ ਹੈ।' },
+  'walk.operator': { en: 'The operator\'s Record screen: machine sticker and field are already set; "Run demo job" replays a job through the real pipeline.', hi: 'ऑपरेटर की रिकॉर्ड स्क्रीन: मशीन स्टिकर और खेत पहले से तय; "डेमो काम चलाएँ" असली प्रक्रिया से एक काम दोहराता है।', pa: 'ਆਪਰੇਟਰ ਦੀ ਰਿਕਾਰਡ ਸਕਰੀਨ: ਮਸ਼ੀਨ ਸਟਿੱਕਰ ਅਤੇ ਖੇਤ ਪਹਿਲਾਂ ਹੀ ਤੈਅ; "ਡੈਮੋ ਕੰਮ ਚਲਾਓ" ਅਸਲੀ ਪ੍ਰਕਿਰਿਆ ਨਾਲ ਇੱਕ ਕੰਮ ਦੁਹਰਾਉਂਦਾ ਹੈ।' },
+  'walk.chc': { en: "The CHC's register: every certificate this phone signed; open one to show the QR an officer scans.", hi: 'CHC का रजिस्टर: इस फ़ोन के हर हस्ताक्षरित प्रमाणपत्र; एक खोलकर वह QR दिखाएँ जिसे अधिकारी स्कैन करता है।', pa: 'CHC ਦਾ ਰਜਿਸਟਰ: ਇਸ ਫ਼ੋਨ ਦੇ ਹਰ ਦਸਤਖ਼ਤੀ ਸਰਟੀਫਿਕੇਟ; ਇੱਕ ਖੋਲ੍ਹ ਕੇ ਉਹ QR ਦਿਖਾਓ ਜੋ ਅਧਿਕਾਰੀ ਸਕੈਨ ਕਰਦਾ ਹੈ।' },
+  'walk.village': { en: 'The village officer\'s visit list: burn alerts and picks to check in person, each filed as a signed visit report.', hi: 'ग्राम अधिकारी की दौरा सूची: जलने की चेतावनियाँ और जाँच के लिए चुने खेत, हर दौरे की हस्ताक्षरित रिपोर्ट।', pa: 'ਪਿੰਡ ਅਧਿਕਾਰੀ ਦੀ ਦੌਰਾ ਸੂਚੀ: ਸਾੜਨ ਦੀਆਂ ਚੇਤਾਵਨੀਆਂ ਅਤੇ ਜਾਂਚ ਲਈ ਚੁਣੇ ਖੇਤ, ਹਰ ਦੌਰੇ ਦੀ ਦਸਤਖ਼ਤੀ ਰਿਪੋਰਟ।' },
+  'walk.block': { en: "The block ADO's claim queue, burn alerts first: open one and decide with a reason. Nothing is paid or rejected automatically.", hi: 'ब्लॉक ADO की दावा कतार, जलने की चेतावनी पहले: एक खोलें और कारण सहित फ़ैसला करें। कुछ भी अपने-आप न भुगतान होता है न नामंज़ूर।', pa: 'ਬਲਾਕ ADO ਦੀ ਦਾਅਵਾ ਕਤਾਰ, ਸਾੜਨ ਦੀ ਚੇਤਾਵਨੀ ਪਹਿਲਾਂ: ਇੱਕ ਖੋਲ੍ਹੋ ਅਤੇ ਕਾਰਨ ਸਮੇਤ ਫ਼ੈਸਲਾ ਕਰੋ। ਕੁਝ ਵੀ ਆਪਣੇ-ਆਪ ਨਾ ਭੁਗਤਾਨ ਹੁੰਦਾ ਹੈ ਨਾ ਨਾਮਨਜ਼ੂਰ।' },
+  'walk.sdao': { en: "The SDAO countersigns phones the ADO enrolled. Tap Countersign: a second officer's key is required.", hi: 'SDAO उन फ़ोन पर दूसरा हस्ताक्षर करता है जिन्हें ADO ने दर्ज किया। दूसरा हस्ताक्षर दबाएँ: दूसरे अधिकारी की कुंजी ज़रूरी है।', pa: 'SDAO ਉਹਨਾਂ ਫ਼ੋਨਾਂ ਉੱਤੇ ਦੂਜਾ ਦਸਤਖ਼ਤ ਕਰਦਾ ਹੈ ਜੋ ADO ਨੇ ਦਰਜ ਕੀਤੇ। ਦੂਜਾ ਦਸਤਖ਼ਤ ਦਬਾਓ: ਦੂਜੇ ਅਧਿਕਾਰੀ ਦੀ ਕੁੰਜੀ ਲਾਜ਼ਮੀ ਹੈ।' },
+  'walk.district': { en: "The DDA's district view: claims by stage, how long they wait, and how much each machine worked.", hi: 'DDA का ज़िला दृश्य: चरण के हिसाब से दावे, वे कितने दिन रुके, और हर मशीन ने कितना काम किया।', pa: 'DDA ਦਾ ਜ਼ਿਲ੍ਹਾ ਦ੍ਰਿਸ਼: ਪੜਾਅ ਮੁਤਾਬਕ ਦਾਅਵੇ, ਉਹ ਕਿੰਨੇ ਦਿਨ ਰੁਕੇ, ਅਤੇ ਹਰ ਮਸ਼ੀਨ ਨੇ ਕਿੰਨਾ ਕੰਮ ਕੀਤਾ।' },
+  'walk.dlec': { en: 'The DLEC member reviews the batch with its evidence, approves or returns each claim, then signs the minutes.', hi: 'DLEC सदस्य सबूत सहित बैच देखता है, हर दावा स्वीकृत या वापस करता है, फिर कार्यवृत्त पर हस्ताक्षर करता है।', pa: 'DLEC ਮੈਂਬਰ ਸਬੂਤ ਸਮੇਤ ਬੈਚ ਦੇਖਦਾ ਹੈ, ਹਰ ਦਾਅਵਾ ਮਨਜ਼ੂਰ ਜਾਂ ਵਾਪਸ ਕਰਦਾ ਹੈ, ਫਿਰ ਕਾਰਵਾਈ ਉੱਤੇ ਦਸਤਖ਼ਤ ਕਰਦਾ ਹੈ।' },
+  'walk.state': { en: 'The State CRM cell sees the read-only roll-up and, under Log, every signed officer action.', hi: 'राज्य CRM सेल सिर्फ़ देखने वाला सारांश और लॉग में हर हस्ताक्षरित अधिकारी कार्य देखता है।', pa: 'ਰਾਜ CRM ਸੈੱਲ ਸਿਰਫ਼ ਦੇਖਣ ਵਾਲਾ ਸਾਰ ਅਤੇ ਲੌਗ ਵਿੱਚ ਹਰ ਦਸਤਖ਼ਤੀ ਅਧਿਕਾਰੀ ਕਾਰਵਾਈ ਦੇਖਦਾ ਹੈ।' },
+};

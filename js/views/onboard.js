@@ -1,11 +1,15 @@
-// views/onboard.js — FIRST RUN (#welcome): choose the language, then "Who are you?".
-// DOM contract (#v-welcome): #welTitle, #welCtx, #welLang [data-lang], #welRole [data-role], #welBackLang, #welTour
+// views/onboard.js — FIRST RUN (#welcome): choose the language, then "Choose a demo account".
+// acc-1 (30 Oct): the second step is the DEMO account picker (views/account.js: walkthrough, "In the field",
+// "Government"); the three plain roles stay below it as "Your own phone, no sample data" for a real phone
+// (field tests), with the officer's level step exactly as before. The judge-tour card stays on this screen.
+// DOM contract (#v-welcome): #welTitle, #welCtx, #welLang [data-lang], #welAccounts, #welOwnTitle, #welRole [data-role], #welBackLang, #welTour
 import * as S from '../services.js';
 import { $, $$, t } from '../ui.js';
 import { HOME, homeFor, LEVEL_ICON } from '../roles.js';
 import { roleTable } from '../govroles.js';
 import { getLang, esc } from '../ui.js';
 import { illusHTML } from '../illus.js';
+import { pickerHTML } from './account.js';
 
 let app, step = 'lang';
 
@@ -13,10 +17,10 @@ export function init(a) {
   app = a;
   $$('#welLang [data-lang]').forEach((b) => b.addEventListener('click', async () => {
     app.settings.lang = b.dataset.lang; app.refreshChrome(); await S.saveSettings(app.settings);
-    step = 'role'; render(); $('#welRole .wel-role')?.focus();
+    step = 'role'; render(); $('#welAccounts .wel-role')?.focus();
   }));
   // the top bar is hidden during first run, so the role step offers its own way back to the language
-  $('#welBackLang').addEventListener('click', () => { step = step === 'level' ? 'role' : 'lang'; render(); (step === 'role' ? $('#welRole .wel-role') : $('#welLang [aria-pressed="true"]'))?.focus(); });
+  $('#welBackLang').addEventListener('click', () => { step = step === 'level' ? 'role' : 'lang'; render(); (step === 'role' ? $('#welAccounts .wel-role') : $('#welLang [aria-pressed="true"]'))?.focus(); });
   $$('#welRole [data-role]').forEach((b) => b.addEventListener('click', async () => {
     app.settings.role = b.dataset.role; await S.saveSettings(app.settings); app.refreshChrome();
     if (b.dataset.role === 'officer') { step = 'level'; render(); $('#welLevel .wel-role')?.focus(); return; } // which government level?
@@ -29,15 +33,20 @@ export function init(a) {
   });
 }
 
-export function show() { step = app.settings.role ? 'role' : 'lang'; render(); }
+// the picker straight away once a language was chosen before (a role, or sample data on this phone: after "Sign out")
+export function show(params) { step = params?.step === 'role' || app.settings.role || app.settings.demoSeedAt ? 'role' : 'lang'; render(); }
 
 function render() {
   // slot 1 (welcome): on the language and role steps; set once, so moving between steps does not re-fade it
   const wi = $('#welIllus');
   if (step === 'level') { wi.hidden = true; } else if (!wi.querySelector('img')) illusHTML(wi, 'welcome-trio'); else wi.hidden = false;
-  $('#welTitle').textContent = step === 'lang' ? 'Choose your language · भाषा चुनें · ਭਾਸ਼ਾ ਚੁਣੋ' : step === 'level' ? t('lvl.ask') : t('role.ask');
-  $('#welCtx').textContent = step === 'lang' ? '' : step === 'level' ? t('lvl.ask_ctx') : t('role.ask_ctx');
+  wi.classList.toggle('is-compact', step === 'role'); // a smaller picture above the nine accounts
+  $('#welTitle').textContent = step === 'lang' ? 'Choose your language · भाषा चुनें · ਭਾਸ਼ਾ ਚੁਣੋ' : step === 'level' ? t('lvl.ask') : t('acc.title');
+  $('#welCtx').textContent = step === 'lang' ? '' : step === 'level' ? t('lvl.ask_ctx') : t('acc.ctx');
   $('#welLang').hidden = step !== 'lang';
+  $('#welAccounts').hidden = step !== 'role';
+  if (step === 'role') $('#welAccounts').innerHTML = pickerHTML(app.settings);
+  $('#welOwnTitle').hidden = step !== 'role';
   $('#welRole').hidden = step !== 'role';
   $('#welLevel').hidden = step !== 'level';
   $('#welBackLang').hidden = step === 'lang';
