@@ -704,3 +704,158 @@ body.is-walking .toast { bottom: calc(var(--walk-h, 150px) + var(--sp-3)); }
   body.is-walking { padding-left: 0; }
   body.is-walking .pp-topbar { margin-left: 0; }
 }
+
+/* ---------- lay-1 (30 Oct): laptop and tablet layouts ----------
+   Phone (< 700 px) stays as it was. Tablet (700–999 px): one wider column. Laptop (≥ 1000 px): the content is
+   centred in the space right of the rail, one max width per kind of screen (forms 720, lists and tables 1120,
+   dashboards 1200), and two-column grids where a screen holds two kinds of content. Same tokens, no new colours. */
+.job-aside { display: flex; flex-direction: column; gap: var(--sp-5); }
+.wel-cols, .wel-col { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+@media (min-width: 700px) { .chart svg.age__bar { height: 24px; } } /* the backlog bar keeps a phone-like thickness in a wider column */
+@media (min-width: 700px) and (max-width: 999px) {
+  #main { max-width: 760px; padding-left: calc(var(--sp-6) + var(--safe-l)); padding-right: calc(var(--sp-6) + var(--safe-r)); }
+  .pp-head__context { max-width: 64ch; }
+}
+
+@media (min-width: 1000px) {
+  :root { --lay-pad: var(--sp-6); --lay-gap: var(--sp-7); --lay-form: 720px; --lay-list: clamp(1120px, 64vw, 1280px); --lay-dash: clamp(1200px, 68vw, 1360px); --lay-sticky: calc(var(--topbar-h) + var(--safe-t) + var(--sp-5)); }
+
+  /* shell: the rail stays; screens without it (first run, operator setup, recording) use the full width */
+  body.is-welcome, body.is-setup, body.is-focus { padding-left: 0; }
+  body.is-welcome .pp-topbar, body.is-setup .pp-topbar { margin-left: 0; }
+  #main { max-width: calc(var(--lay-form) + 2 * var(--lay-pad)); padding: var(--sp-6) var(--lay-pad) var(--sp-8); }
+  #main:has(> :is(#v-certs, #v-cert, #v-verify, #v-farmer, #v-phones, #v-queue, #v-visits, #v-approvals, #v-log, #v-batch, #v-dlec, #v-job, #v-opsetup):not([hidden])) { max-width: calc(var(--lay-list) + 2 * var(--lay-pad)); }
+  #main:has(> :is(#v-dash, #v-district, #v-state, #v-field, #v-welcome):not([hidden])) { max-width: calc(var(--lay-dash) + 2 * var(--lay-pad)); }
+  .pp-head__context { max-width: 72ch; }
+  .tour-bar__in { max-width: calc(var(--lay-list) + 2 * var(--lay-pad)); padding-left: var(--lay-pad); padding-right: var(--lay-pad); }
+
+  /* illustrations scale with the window, stay under 40 % of the first screen; empty states stay small */
+  .illus-slot--wide { max-width: clamp(320px, 28vw, 440px); }
+  .illus-slot--card { max-width: clamp(240px, 22vw, 340px); }
+  .illus-slot--empty { max-width: clamp(180px, 15vw, 240px); }
+  .illus-slot img { max-height: 30dvh; }
+  .empty .illus-slot--empty img { max-height: 22dvh; }
+
+  /* account picker: picture, title and Walkthrough on the left; "In the field" | "Government" on the right */
+  #v-welcome { display: grid; grid-template-columns: clamp(260px, 28vw, 380px) minmax(0, 1fr); grid-template-rows: auto auto auto auto 1fr; grid-auto-flow: row dense; column-gap: var(--sp-8); row-gap: var(--sp-4); align-items: start; }
+  #v-welcome > * { grid-column: 1; }
+  #v-welcome > .illus-slot { margin: 0; }
+  #welIllus img, #welIllus.is-compact img { max-height: 30dvh; }
+  #welAccounts { display: contents; }
+  #welAccounts > .wel-cols, #welLang, #welLevel { grid-column: 2; grid-row: 1 / 6; }
+  #welAccounts > .wel-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-5); align-items: start; }
+  #welAccounts .wel-col > .wel-group { margin-top: 0; }
+  #welOwnTitle, #welRole { grid-column: 2; }
+  #welOwnTitle { margin-top: var(--sp-4); }
+  #welBackLang { align-self: start; justify-self: start; order: 2; } /* placement order only: the judge card first, the language link last */
+  #welTour { order: 1; }
+
+  /* lists: the row's lines become columns (name · details · status), the number stays right */
+  .list > .item { min-height: 60px; gap: var(--sp-4); }
+  .list > .item > .grow { display: grid; grid-auto-flow: column; grid-template-columns: minmax(0, 1.1fr); grid-auto-columns: minmax(0, 1fr); column-gap: var(--sp-5); align-items: baseline; }
+  .list > .item > .grow > small { margin-top: 0; }
+  :is(#phonesList, #approvalsBody) .pp-card > .pp-row > .pp-row__main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); column-gap: var(--sp-5); align-items: baseline; }
+  #phonesScan, #farmerOpen { width: auto; min-width: 320px; align-self: flex-start; justify-self: start; }
+  .gov-view .pp-field, .gov-view .gov-decide, .gov-view .gov-choices { max-width: var(--lay-form); }
+
+  /* dashboards: KPI tiles in one row of 4 (.kpis-4), backlog and machine use side by side */
+  :is(#districtBody, #stateBody) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--lay-gap); row-gap: var(--sp-5); align-items: start; }
+  :is(#districtBody, #stateBody) > * { grid-column: 1 / -1; }
+  :is(#districtBody, #stateBody) > section.pp-section:nth-of-type(1) { grid-column: 1; }
+  :is(#districtBody, #stateBody) > section.pp-section:nth-of-type(2) { grid-column: 2; }
+  /* officer dashboard: the 7-column table keeps its width, the map column narrows; the status cell may wrap */
+  .dash-split { grid-template-columns: minmax(0, 1fr) clamp(280px, 26%, 420px); }
+  #dashTable td:first-child, #dashTable .stage-sub { white-space: normal; }
+  #dashTable td:first-child { min-width: 150px; max-width: 200px; }
+  .roll__row { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(0, 2fr); align-items: baseline; column-gap: var(--sp-5); }
+
+  /* record, set-up: checklist, field, Start and job details on the left; the practice entries beside them */
+  #jobSetup { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 320px); grid-auto-flow: row dense; column-gap: var(--lay-gap); align-items: start; }
+  #jobSetup > * { grid-column: 1; }
+  #jobSetup > .job-aside { grid-column: 2; grid-row: 2 / span 2; flex-direction: column-reverse; gap: var(--sp-3); }
+  #jobSetup > #firstFieldIllus { margin: 0; }
+  /* record, live: status, numbers and Hold to stop on the left; the tractor and the map on the right */
+  #jobLive { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-rows: auto auto auto auto auto 1fr;
+    grid-template-areas: "top illus" "status illus" "stats map" "sens map" "stop map" ". map"; column-gap: var(--lay-gap); align-items: start; }
+  #jobLive > .pp-rec__top { grid-area: top; }
+  #jobLive > #statusPill { grid-area: status; }
+  #jobLive > #recIllus { grid-area: illus; justify-self: start; width: clamp(220px, 20vw, 320px); max-width: 100%; margin-top: 0; }
+  #jobLive > .pp-stats { grid-area: stats; }
+  #jobLive > .map-wrap { grid-area: map; }
+  #jobLive:has(> #recIllus[hidden]) > .map-wrap { grid-row: 1 / -1; }
+  #jobLive > #recSensors { grid-area: sens; }
+  #jobLive > .rec-stopbar { grid-area: stop; margin: 0; padding-left: 0; padding-right: 0; }
+  #jobLive .map-tall { height: clamp(320px, calc(100dvh - 320px), 560px); }
+  /* record, result: the numbers, checks and details on the left; the map on the right; Issue at the bottom */
+  #jobResult { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto auto auto auto 1fr auto;
+    grid-template-areas: "head head" "kpis map" "checks map" "sat map" "tech map" ". map" "act act"; column-gap: var(--lay-gap); align-items: start; }
+  #jobResult > .pp-head { grid-area: head; }
+  #jobResult > #resKpis { grid-area: kpis; }
+  #jobResult > .map-wrap { grid-area: map; position: sticky; top: var(--lay-sticky); }
+  #jobResult > .pp-section { grid-area: checks; }
+  #jobResult > #slotSatPics { grid-area: sat; }
+  #jobResult > #resTech { grid-area: tech; }
+  #jobResult > .pp-actionbar { grid-area: act; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--sp-3); }
+  #jobResult #issueBtn { width: auto; min-width: 360px; }
+  #jobResult .res-cert-link { margin: 0; }
+  #resMap { height: clamp(320px, 52dvh, 520px); }
+
+  /* fields: the map takes ~60 % of the width, the controls sit beside it */
+  #v-field { display: grid; grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr); grid-template-rows: auto repeat(10, auto) 1fr; grid-auto-flow: row dense; column-gap: var(--lay-gap); row-gap: var(--sp-4); align-items: start; }
+  #v-field > *, #v-field > .pp-section > * { grid-column: 2; }
+  #v-field > .pp-head { grid-column: 1 / -1; margin-bottom: var(--sp-2); }
+  #v-field > .pp-section { display: contents; }
+  #v-field .map-wrap { grid-column: 1; grid-row: 2 / -1; position: sticky; top: var(--lay-sticky); }
+  #v-field .map-tall { height: clamp(420px, calc(100dvh - 240px), 720px); }
+  #v-field > .pp-rule { margin: var(--sp-2) 0; }
+  #v-field > .illus-slot { margin: 0; }
+
+  /* operator set-up: the form on the left, the picture beside the heading */
+  #v-opsetup { display: grid; grid-template-columns: minmax(0, 1fr) clamp(240px, 26vw, 360px); grid-auto-flow: row dense; column-gap: var(--lay-gap); align-items: start; }
+  #v-opsetup > * { grid-column: 1; }
+  #v-opsetup > #opIllus { grid-column: 2; grid-row: 1 / span 4; margin: 0; max-width: none; }
+
+  /* certificates: verdict, acres and stages on the left; the details list on the right, label and value close */
+  #v-farmer { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-auto-flow: row dense; column-gap: var(--lay-gap); align-items: start; }
+  #v-farmer > * { grid-column: 1; }
+  #v-farmer > #farmerView { grid-column: 1 / -1; }
+  #v-farmer > #farmerIllus { grid-column: 2; grid-row: 1 / span 2; width: clamp(220px, 20vw, 300px); margin: 0; }
+  #farmerView:has(> .pp-verdict) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); grid-template-rows: repeat(5, auto) 1fr auto; column-gap: var(--lay-gap); row-gap: var(--sp-4); align-items: start; }
+  #farmerView:has(> .pp-verdict) > * { grid-column: 1; }
+  #farmerView:has(> .pp-verdict) > .pp-dl { grid-column: 2; grid-row: 1 / 7; }
+  #farmerView:has(> .pp-verdict) > .pp-dl + .hint { grid-column: 2; grid-row: 7; }
+  #farmerShare { justify-self: start; width: auto; min-width: 320px; }
+  #v-verify > :is(.pp-head, .stack-8, .scan, details.paste) { width: 100%; max-width: var(--lay-form); }
+  #verifyResult { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); grid-template-rows: auto auto auto 1fr; column-gap: var(--lay-gap); align-items: start; }
+  #verifyResult > * { grid-column: 1; }
+  #verifyResult > .pp-dl { grid-column: 2; grid-row: 1 / 5; }
+  #verifyResult > :is(details, p.hint) { grid-column: 1 / -1; }
+  #verifyResult > .btn { justify-self: start; }
+  #certNext:has(> #certNextIllus:not([hidden])) { display: grid; grid-template-columns: clamp(220px, 22vw, 320px) minmax(0, 1fr); column-gap: var(--lay-gap); align-content: center; }
+  #certNext > * { grid-column: 2; }
+  #certNext > #certNextIllus { grid-column: 1; grid-row: 1 / span 4; margin: 0; max-width: none; }
+  #certNext .btn-xxl { width: auto; min-width: 320px; justify-self: start; align-self: flex-start; }
+  .cert-actions { display: flex; flex-wrap: wrap; }
+  .cert-actions > .btn { min-width: 200px; }
+}
+/* the certificate document at full laptop width: left = status, title, acres, map, checks; right = the list */
+@container (min-width: 880px) {
+  .pp-doc__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 540px); grid-template-rows: auto auto auto auto auto auto 1fr auto auto; column-gap: 56px; align-items: start; }
+  .pp-doc__in > * { grid-column: 1 / -1; }
+  .pp-doc__in > .pp-doc__top { grid-row: 1; }
+  .pp-doc__in > .pp-doc__eyebrow { grid-column: 1; grid-row: 2; }
+  .pp-doc__in > .pp-doc__title { grid-column: 1; grid-row: 3; }
+  .pp-doc__body { display: contents; }
+  .pp-doc__body > div { grid-column: 1; grid-row: 4; }
+  .pp-doc__in > .pp-doc__map { grid-column: 1; grid-row: 5; }
+  .pp-doc__in > .pp-doc__checks { grid-column: 1; grid-row: 6; }
+  .pp-doc__body > .pp-dl { grid-column: 2; grid-row: 2 / 8; margin-top: var(--sp-5); }
+  .pp-doc__in > .pp-doc__foot { grid-row: 8; }
+  .pp-doc__in > .pp-doc__notice { grid-row: 9; }
+  .pp-doc .pp-dl--grid { display: block; }
+  .pp-doc .pp-dl--grid > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-4); }
+  .pp-doc .pp-dl--grid > div:last-child { border-bottom: 1px solid #E4E7E2; }
+  .pp-doc .pp-dl--grid dt { font-size: inherit; }
+  .pp-doc .pp-dl--grid dd { margin-top: 0; text-align: right; }
+}

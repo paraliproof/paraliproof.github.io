@@ -142,6 +142,12 @@ export function makeMap(el, { center = [30.2, 76.3], zoom = 8, zoomControl = tru
     maxZoom: 19, maxNativeZoom: 18, attribution: 'Imagery © Esri, Maxar, Earthstar Geographics',
   });
   let satOn = false;
+  // lay-1: the map's box changes with the layout (laptop grids, a view shown again); keep Leaflet in step.
+  // A hidden map (0 × 0) is skipped, so its centre never drifts.
+  if (typeof ResizeObserver === 'function') {
+    let raf = 0;
+    new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (el.clientWidth && el.clientHeight) map.invalidateSize(); }); }).observe(el);
+  }
   return {
     map,
     toggleSatellite() {

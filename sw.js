@@ -14,7 +14,7 @@
 //     font stylesheet and files never reached the cache and an offline reload fell back to system fonts.
 //   • Map tiles — network-first, cached as you view them (max ~600 tiles) so a
 //     field you looked at once still shows offline.
-const VERSION = 'pp-v1.10.0-acc1';
+const VERSION = 'pp-v1.10.1-lay1';
 const SHELL = `shell-${VERSION}`, LIBS = 'libs-v1', TILES = 'tiles-v1';
 // Real Sentinel-2 tiles for the result screen (tools/make_sat_thumbs.py; tests/sat-tour.test.mjs checks this list).
 const SAT_TILE_FILES = [

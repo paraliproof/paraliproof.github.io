@@ -35,8 +35,9 @@ export function pickerHTML(settings) {
   const row = (a) => `<button type="button" class="pp-row wel-role acct-row" data-account="${esc(a.id)}"${a.id === cur ? ' aria-current="true"' : ''}>${avatar(a)}
     <span class="pp-row__main"><span class="pp-row__title">${esc(a.name)}</span><span class="pp-row__meta">${esc(roleLine(a))}</span><span class="pp-row__meta acct-row__place">${esc(placeLine(a))}</span></span>${pill()}</button>`;
   return `<div class="pp-card pp-card--flush"><button type="button" class="pp-row wel-role acct-walk" data-walk="1">${icon('play')}<span class="pp-row__main"><span class="pp-row__title">${esc(t('acc.walk'))}</span><span class="pp-row__meta">${esc(t('acc.walk_sub'))}</span></span>${icon('chevron-right')}</button></div>`
-    + ACCOUNT_GROUPS.map((g) => `<h2 class="pp-section__title wel-group" id="welGroup-${g}">${esc(t('acc.g_' + g))}</h2>
-    <div class="pp-card pp-card--flush" role="group" aria-labelledby="welGroup-${g}">${DEMO_ACCOUNTS.filter((a) => a.group === g).map(row).join('')}</div>`).join('');
+    // lay-1: each group in its own column wrapper (two columns on a laptop, stacked on a phone)
+    + `<div class="wel-cols">${ACCOUNT_GROUPS.map((g) => `<section class="wel-col"><h2 class="pp-section__title wel-group" id="welGroup-${g}">${esc(t('acc.g_' + g))}</h2>
+    <div class="pp-card pp-card--flush" role="group" aria-labelledby="welGroup-${g}">${DEMO_ACCOUNTS.filter((a) => a.group === g).map(row).join('')}</div></section>`).join('')}</div>`;
 }
 
 /** Load the sample data once (progress sheet), never in judge mode. Errors are shown, the account still opens. */
